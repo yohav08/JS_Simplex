@@ -74,39 +74,63 @@ https://templatemo.com/tm-579-cyborg-gaming
 
                <!-- ***** Banner Start ***** -->
                <div class="main-banner">
-               <div class="row">
-                  <div class="col-lg-7">
-                     <div class="header-text">
-                     <h6>Bienvenido a JS-Simplex</h6>
-                     <h4><em>Calcula</em> Mediante dos Métodos aquí</h4>
+                  <div class="row">
+                     <div class="col-lg-7">
+                        <div class="header-text">
+                        <h6>Bienvenido a JS-Simplex</h6>
+                        <h4><em>Calcula</em> Mediante dos Métodos aquí</h4>
+                        </div>
                      </div>
                   </div>
                </div>
-               </div>
                <!-- ***** Banner End ***** -->
+
+               <!-- ***** Solicitud de datos ***** -->
+               <div class="gaming-library">
+                  <div class="col-lg-12">
+                     <div class="heading-section">
+                        <center>
+                           <h4>Ingresa los Valores</h4>
+                        </center>
+                     </div>
+                     <div class="item">
+
+                        <center>
+                           <label for="tam_variables"><h5>Cantidad de variables</h5></label>
+                           <input style="width : 500px;" type="number"class="form-control" id="tam_variables" name="tam_variables" placeholder="Escriba número de Variables"><br>
+                                 
+                           <label for="tam_restricciones"><h5>Cantidad de Restricciones</h5></label>
+                           <input style="width : 500px; " type="text"class="form-control" id="tam_restricciones" name="tam_restricciones" placeholder="Escriba número de Restricciones"><br>
+                                 
+
+                           <div style= "margin: 1% auto;" ></div>
+                           <input  type="button" value="Generar Modelo" id="cal"  onclick="myFunction()" class="btn btn-primary">
+                           <input  type="button" value="Limpiar" id="cal"  onclick="limpiar()" class="btn btn-success">
+                        </center>
+
+                     </div>
+                  </div>
+               </div>
+               <!-- ***** Solicitud de datos ***** -->
+
 
                <!-- ***** Dos Fases ***** -->
                <div class="gaming-library">
-               <div class="col-lg-12">
-                  <div class="heading-section">
-                     <h4><em>Método de </em> las Dos Fases</h4>
+                  <div class="col-lg-12">
+                     <div class="heading-section">
+                        <h4><em>Método de </em> las Dos Fases</h4>
+                     </div>
+                     <div class="item">
+                        <ul>
+                        <li><img src="assets/images/game-01.jpg" alt="" class="templatemo-item"></li>
+                        <li><h4>Dota 2</h4><span>Sandbox</span></li>
+                        <li><h4>Date Added</h4><span>24/08/2036</span></li>
+                        <li><h4>Hours Played</h4><span>634 H 22 Mins</span></li>
+                        <li><h4>Currently</h4><span>Downloaded</span></li>
+                        <li><div class="main-border-button border-no-active"><a href="#">Donwloaded</a></div></li>
+                        </ul>
+                     </div>
                   </div>
-                  <div class="item">
-                     <ul>
-                     <li><img src="assets/images/game-01.jpg" alt="" class="templatemo-item"></li>
-                     <li><h4>Dota 2</h4><span>Sandbox</span></li>
-                     <li><h4>Date Added</h4><span>24/08/2036</span></li>
-                     <li><h4>Hours Played</h4><span>634 H 22 Mins</span></li>
-                     <li><h4>Currently</h4><span>Downloaded</span></li>
-                     <li><div class="main-border-button border-no-active"><a href="#">Donwloaded</a></div></li>
-                     </ul>
-                  </div>
-               </div>
-               <div class="col-lg-12">
-                  <div class="main-button">
-                     <a href="#">Volver Arriba</a>
-                  </div>
-               </div>
                </div>
                <!-- ***** Dos Fases ***** -->
 
@@ -159,10 +183,6 @@ https://templatemo.com/tm-579-cyborg-gaming
   <script src="vendor/jquery/jquery.min.js"></script>
   <script src="vendor/bootstrap/js/bootstrap.min.js"></script>
 
-  <script src="assets/js/isotope.min.js"></script>
-  <script src="assets/js/owl-carousel.js"></script>
-  <script src="assets/js/tabs.js"></script>
-  <script src="assets/js/popup.js"></script>
   <script src="assets/js/custom.js"></script>
 
 
