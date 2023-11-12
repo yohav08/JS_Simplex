@@ -12,6 +12,8 @@
 
     <!-- Bootstrap core CSS -->
     <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    
+  <script src="js/index.js"></script>
 
 
     <!-- Additional CSS Files -->
@@ -20,12 +22,8 @@
     <link rel="stylesheet" href="assets/css/owl.css"> 
     <link rel="stylesheet" href="assets/css/animate.css">
     <link rel="stylesheet"href="https://unpkg.com/swiper@7/swiper-bundle.min.css"/>
-<!--
-
-TemplateMo 579 Cyborg Gaming
-
+<!-- TemplateMo 579 Cyborg Gaming
 https://templatemo.com/tm-579-cyborg-gaming
-
 -->
   </head>
 
@@ -86,29 +84,44 @@ https://templatemo.com/tm-579-cyborg-gaming
                <!-- ***** Banner End ***** -->
 
                <!-- ***** Solicitud de datos ***** -->
+               
                <div class="gaming-library">
                   <div class="col-lg-12">
-                     <div class="heading-section">
+
+                    <div class="heading-section">
                         <center>
                            <h4>Ingresa los Valores</h4>
                         </center>
                      </div>
                      <div class="item">
-
                         <center>
                            <label for="tam_variables"><h5>Cantidad de variables</h5></label>
-                           <input style="width : 500px;" type="number"class="form-control" id="tam_variables" name="tam_variables" placeholder="Escriba número de Variables"><br>
+                           <input min="1" max="20" style="width : 500px;" type="number"class="form-control" id="tam_variables" placeholder="Escriba número de Variables" required><br>
                                  
                            <label for="tam_restricciones"><h5>Cantidad de Restricciones</h5></label>
-                           <input style="width : 500px; " type="text"class="form-control" id="tam_restricciones" name="tam_restricciones" placeholder="Escriba número de Restricciones"><br>
+                           <input min="1" max="20" style="width : 500px; " type="text"class="form-control" id="tam_restricciones" placeholder="Escriba número de Restricciones" required><br>
                                  
 
                            <div style= "margin: 1% auto;" ></div>
-                           <input  type="button" value="Generar Modelo" id="cal"  onclick="myFunction()" class="btn btn-primary">
-                           <input  type="button" value="Limpiar" id="cal"  onclick="limpiar()" class="btn btn-success">
+                           <input  type="button" value="Generar Modelo" id="modelo" onclick="" class="btn btn-primary">&nbsp&nbsp
+                           <input  type="button" value="Limpiar" id="limpiar" onclick="Limpiar()" class="btn btn-success">
+                        </center>
+                     </div>
+
+                     <div id="modelo_funcion"></div>
+                     <div class="heading-section">
+                        <center><h4><em>Función O</em>bjetivo </h4></center>
+                     </div>
+
+                     <center> 
+                        <div style="display: inline-flexbox;"> 
+                           <input min="1" max="20" style="width : 80px; display: block;" type="number"class="form-control" id="tam_variables" placeholder="Escriba número de Variables" required>
+                           <p class="main-info header-text" style="font-size: 2em; color: azure;">X <sub>2</sub></p> 
+                        
+                        </div>
                         </center>
 
-                     </div>
+                     <div id="modelo_metodo"></div>
                   </div>
                </div>
                <!-- ***** Solicitud de datos ***** -->
