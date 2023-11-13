@@ -29,48 +29,48 @@ https://templatemo.com/tm-579-cyborg-gaming
 
 <body>
 
-  <!-- ***** Preloader Start ***** -->
-  <div id="js-preloader" class="js-preloader">
-    <div class="preloader-inner">
+   <!-- ***** Preloader Start ***** -->
+   <div id="js-preloader" class="js-preloader">
+      <div class="preloader-inner">
       <span class="dot"></span>
       <div class="dots">
          <span></span>
          <span></span>
          <span></span>
       </div>
-    </div>
-  </div>
-  <!-- ***** Preloader End ***** -->
+      </div>
+   </div>
+   <!-- ***** Preloader End ***** -->
 
-  <!-- ***** Header Area Start ***** -->
-  <header class="header-area header-sticky">
-    <div class="container">
-        <div class="row">
+   <!-- ***** Header Area Start ***** -->
+   <header class="header-area header-sticky">
+      <div class="container">
+         <div class="row">
             <div class="col-12">
-                <nav class="main-nav">
-                    <!-- ***** Logo Start ***** -->
-                    <a href="index.html" class="logo">
+                  <nav class="main-nav">
+                     <!-- ***** Logo Start ***** -->
+                     <a href="index.html" class="logo">
                         <img src="assets/images/logo.png" alt="">
-                    </a>
-                    <!-- ***** Logo End ***** -->
-                    <!-- ***** Menu Start ***** --> 
-                    <a class='menu-trigger'>
+                     </a>
+                     <!-- ***** Logo End ***** -->
+                     <!-- ***** Menu Start ***** --> 
+                     <a class='menu-trigger'>
                         <span>Menu</span>
-                    </a>
-                    <!-- ***** Menu End ***** -->
-                </nav>
+                     </a>
+                     <!-- ***** Menu End ***** -->
+                  </nav>
             </div>
-        </div>
-    </div>
-  </header>
-  <!-- ***** Header Area End ***** -->
+         </div>
+      </div>
+   </header>
+   <!-- ***** Header Area End ***** -->
 
   <div class="container">
       <div class="row">
          <div class="col-lg-12">
             <div class="page-content">
 
-               <!-- ***** Banner Start ***** -->
+               <!-- ***** Bienvenida Start ***** -->
                <div class="main-banner">
                   <div class="row">
                      <div class="col-lg-7">
@@ -81,47 +81,69 @@ https://templatemo.com/tm-579-cyborg-gaming
                      </div>
                   </div>
                </div>
-               <!-- ***** Banner End ***** -->
+               <!-- ***** Bienvenida End ***** -->
 
                <!-- ***** Solicitud de datos ***** -->
                
                <div class="gaming-library">
                   <div class="col-lg-12">
 
-                    <div class="heading-section">
-                        <center>
-                           <h4>Ingresa los Valores</h4>
-                        </center>
-                     </div>
-                     <div class="item">
-                        <center>
-                           <label for="tam_variables"><h5>Cantidad de variables</h5></label>
-                           <input min="1" max="20" style="width : 500px;" type="number"class="form-control" id="tam_variables" placeholder="Escriba número de Variables" required><br>
-                                 
-                           <label for="tam_restricciones"><h5>Cantidad de Restricciones</h5></label>
-                           <input min="1" max="20" style="width : 500px; " type="text"class="form-control" id="tam_restricciones" placeholder="Escriba número de Restricciones" required><br>
-                                 
+                     <!-- Generar la captura de datos -->
+                     <form action=""> 
+                        <div id="captura_cantidad" style="display: block;" class="heading-section">
+                           <center> <h4>Ingresa los Valores</h4> </center>
+                        </div>
+                        <div id="captura_cantidad_1" style="display: block;" class="item">
+                           <center>
+                              <label for="tam_variables"><h5>Cantidad de variables</h5></label>
+                              <input min="2" max="20" style="width : 500px;" type="number"class="form-control" id="tam_variables" placeholder="Escriba número de Variables" required><br>
+                                    
+                              <label for="tam_restricciones"><h5>Cantidad de Restricciones</h5></label>
+                              <input min="1" max="20" style="width : 500px;" type="number"class="form-control" id="tam_restricciones" placeholder="Escriba número de Restricciones" required><br>   
 
-                           <div style= "margin: 1% auto;" ></div>
-                           <input  type="button" value="Generar Modelo" id="modelo" onclick="" class="btn btn-primary">&nbsp&nbsp
-                           <input  type="button" value="Limpiar" id="limpiar" onclick="Limpiar()" class="btn btn-success">
-                        </center>
-                     </div>
+                              <div style= "margin: 1% auto;" ></div>
+                              <input  type="button" value="Generar Modelo" id="modelo" onclick="Modelo()" class="btn btn-primary">&nbsp&nbsp
+                              <input  type="reset" value="Limpiar" id="limpiar" class="btn btn-success">
+                           </center>
+                        </div>
+                     </form>
 
-                     <div id="modelo_funcion"></div>
-                     <div class="heading-section">
-                        <center><h4><em>Función O</em>bjetivo </h4></center>
-                     </div>
+                     <!-- Captura de datos -->
+                     <form action="">
+                        <div id="modelo_funcion" style="display: none;">
+                           <center>
+                              <input  type="button" value="Editar Problema" id="Continuar" onclick="Editar()" class="btn btn-primary">&nbsp&nbsp
+                           </center>
+                              <br><div><center><h5>FUNCIÓN OBJETIVO</h5></center></div>
+                           <center> 
+                              <p> <div id="funcion" style="height : auto;"class="input-group col-lg-12" ></div></p>
+                           </center>
+                        </div>
 
-                     <center> 
-                        <p style=" "> 
-                           <input id="tam_variables"  min="1" max="20" style="width : 80px;" type="number"class="form-control" placeholder="Escriba número de Variables" required> 
 
-                           <span  for="tam_variables" class="main-info header-text" style="font-size: 1.5em; color: azure;">X<sub>2</sub>+</span>
-                        </p>
-                        </center>
+                        <div id="modelo_restricciones" style="display: none;">
+                           
+                              <div><center><br><h5>RESTRICCIONES</h5></center></div>
+                              <center> 
+                                 <div id="N_restriccion" class="input-group col-lg-12"> </div>
+                              </center>
+                           
+                        </div>
 
-                     <div id="modelo_metodo"></div>
+                        <div id="objetivo" style="display: none;">
+                           <center> 
+                              <div><center><br><h5>OBJETIVO : </h5></center></div>
+                                 <select style="width: 200px; " class="form-select">
+                                    <option value="max">Maximizar</option> 
+                                    <option value="min">Minimizar</option>
+                                 </select> <br>
+                              
+                              <input  type="button" value="Continuar" id="Continuar" onclick="Generar_metodo()" class="btn btn-primary">&nbsp&nbsp
+                              <input  type="reset" value="Limpiar" id="limpiar" class="btn btn-success">
+                           </center>
+                        </div>
+                     </form>
+
                   </div>
                </div>
                <!-- ***** Solicitud de datos ***** -->
@@ -181,7 +203,7 @@ https://templatemo.com/tm-579-cyborg-gaming
   <footer>
     <div class="container">
       <div class="row">
-         <div class="col-lg-12">
+         <div class="">
             <p>Copyright © 2036 <a href="#">Cyborg Gaming</a> Company. All rights reserved. 
             
             <br>Design: <a href="https://templatemo.com" target="_blank" title="free CSS templates">TemplateMo</a>  Distributed By <a href="https://themewagon.com" target="_blank" >ThemeWagon</a></p>
@@ -191,12 +213,11 @@ https://templatemo.com/tm-579-cyborg-gaming
   </footer>
 
 
-  <!-- Scripts -->
-  <!-- Bootstrap core JavaScript -->
-  <script src="vendor/jquery/jquery.min.js"></script>
-  <script src="vendor/bootstrap/js/bootstrap.min.js"></script>
-
-  <script src="assets/js/custom.js"></script>
+   <!-- Scripts -->
+   <!-- Bootstrap core JavaScript -->
+   <script src="vendor/jquery/jquery.min.js"></script>
+   <script src="vendor/bootstrap/js/bootstrap.min.js"></script>
+   <script src="assets/js/custom.js"></script>
 
 
   </body>
