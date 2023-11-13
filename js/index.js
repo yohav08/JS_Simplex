@@ -76,24 +76,7 @@ function Generar_metodo(){
         }   
         matriz[i][n_restricciones] = document.getElementById("num_X"+(i+1)+"").value;     
     }
-
     console.log(matriz)
-    // alert(matriz);
-    
-
-    // for (let i = 0; i < n_restricciones; i++) {
-    //     for (let y = 0; y < n_variables; y++) {
-            
-    //         document.getElementById("N_restriccion").innerHTML += '<center> <input  id="num_X'+(y+1)+'_Y'+(i+1)+'" type="number" style="width : 90px; border: 4px solid rgba(0, 0, 0, 0.0);" class="matriz form-control"> </center>';
-    //         document.getElementById("N_restriccion").innerHTML += '<center> <div><span id="var_X'+(y+1)+'_Y'+(i+1)+'" style="font-size: 1.5em; color: azure;">&nbspX<sub id="variable">'+(y+1)+'_Y'+(i+1)+'</sub><span id="signo">+</span>&nbsp</span></div> </center>';
-            
-    //     } 
-    //     document.getElementById("N_restriccion").innerHTML +='&nbsp&nbsp&nbsp<select style="width : 90px; border: 4px solid rgba(0, 0, 0, 0.0);" class="matriz form-select-sm"><option value="1"> ≤ </option> <option value="2"> ≥ </option> <option value="3"> = </option> </select> &nbsp&nbsp&nbsp';
-    //     document.getElementById("N_restriccion").innerHTML += '<center> <input  id="num_X'+(i+1)+'" type="number" style="width : 100px; border: 5px solid rgba(0, 0, 0, 0.0);" class="form-control"> </center>';
-    // }
-    
-
-    
 }
 
 void function test() {
