@@ -4,11 +4,13 @@ function Editar(){
     document.getElementById("captura_cantidad_1").style = "display: block";
     document.getElementById("modelo_funcion").style = "display: none";
     document.getElementById("modelo_restricciones").style = "display: none";
-    document.getElementById("objetivo").style = "display: none";   
+    document.getElementById("objetivo").style = "display: none";
+    document.getElementById("modelo_textual").style = "display: none";   
 }
 
 // Método para la generación del modelo para la captura de datos del método
 function Modelo() {
+
     let n_variables = document.getElementById("tam_variables").value;  
     let n_restricciones = document.getElementById("tam_restricciones").value;   
     
@@ -58,36 +60,28 @@ function Modelo() {
 
 function Generar_metodo(){
 
-    //filas
-    let n_variables = document.getElementById("tam_variables").value;  
-    //columnas
-    let n_restricciones = document.getElementById("tam_restricciones").value;
+    document.getElementById("modelo_textual").style = "display: block";
 
-    let variable_r = 0;
-    let variable_s = 0;
-    let variable_h = 0;
+    // #filas
+    let n_variables = parseFloat(document.getElementById("tam_variables").value);  
+    // #columnas
+    let n_restricciones = parseFloat(document.getElementById("tam_restricciones").value);
+    // # de variables artificiales
+    let variable_r = 0, variable_s = 0, variable_h = 0, auxiliar = 0;
 
-    let matriz = new Array(2);
-    matriz[0] = new Array(n_variables+1);
-    matriz[1] = new Array(n_restricciones);
-
-
-    // Reiniciando las variables agregadas
+    // Reiniciando las variables textuales agregadas
     document.getElementById("modelo_textual_1").innerHTML ='';
-    let posicion_artificial = 0;
     
+
+
+    //Agregando modelo textual de las variables artificiales que se trabajarán
     for (let i = 0; i < n_restricciones; i++) {
         let combo_1 = document.getElementById("variables_adicionales"+(i+1));
         let rest_1 = combo_1.options[combo_1.selectedIndex].value;
 
-        // console.log("HOLA: "+i+": "+rest_1);
-
-        
         if (rest_1 == "mayor_igual") {
             variable_s++;
             variable_r++;
-            
-            
             document.getElementById("modelo_textual_1").innerHTML +='<li style="font-size: 1.2rem; color: aliceblue;"><span>'+'&nbsp&nbsp&nbsp '+(i+1)+'. Tiene signo "≥" (mayor igual) por lo que se restará la variable de exceso S'+variable_s+' y se sumará la variable artificial R'+variable_r+'.</span></li>';
     
         } else if (rest_1 == "menor_igual") {
@@ -100,92 +94,126 @@ function Generar_metodo(){
             
         }
     }
-    
-    let variable_aux= variable_r+ variable_s+variable_h;
-    console.log("Variables artificiales: "+variable_aux);
 
-    let matriz_aux = new Array(2);
-    matriz_aux[0] = new Array(variable_aux);
-    matriz_aux[1] = new Array(n_restricciones);
-
-    
-    for (let i = 0; i < variable_aux; i++) {
-        matriz_aux[0][i]=0;
-        matriz_aux[1][i]=0;
-
-        // for (let j = 0; j < n_restricciones; j++) {
-        //     matriz_aux[i][j] = 0;  
-        // }
-        
+    //Creando matriz dinámica para capturar el modelo
+    let matriz = new Array(n_restricciones);
+    for (let i = 0; i < n_restricciones; i++) {
+        matriz[i] = new Array(n_variables+1);
+    }
+    //Creando la matriz con los respectivos valores extraídos del modelo
+    for (let i = 0; i < n_restricciones; i++) {
+        for (let y = 0; y <n_variables; y++) {
+            matriz [i][y] = parseFloat(document.getElementById("num_X"+(y+1)+"_Y"+(i+1)+"").value);
+        }   
+        matriz[i][n_restricciones] = parseFloat(document.getElementById("num_X"+(i+1)+"").value);     
     }
 
-    let auxiliar=0;
-    for (let i = 0; i < n_restricciones; i++) {
-        
+    // Contando el número de variables artificiales, de Superavit y Holgura que se agregarán
+    let variable_aux = variable_r+ variable_s+variable_h;
 
+    // Creando matriz dinámica con las variables artificiales
+    let matriz_aux = new Array(n_restricciones);
+    for (let i = 0; i < n_restricciones; i++) {
+        matriz_aux[i] = new Array(variable_aux);
+    }
+    // Rellenando la Matriz de ceros para agregar las variables artificales
+    for (let i = 0; i < n_restricciones; i++) {
+        for (let y = 0; y < variable_aux; y++) {
+            matriz_aux[i][y]= 0 ;
+        }
+    }
+
+    variable_h = 0; variable_r = 0; variable_s = 0;
+    let C_x = [];
+
+    //Agregando las variables artificiales a la matriz
+    for (let i = 0; i < n_restricciones; i++) {
         let combo_1 = document.getElementById("variables_adicionales"+(i+1));
         let rest_1 = combo_1.options[combo_1.selectedIndex].value;
 
         if (rest_1 == "mayor_igual") {
-            // variable_s++; // -1
-            //  variable_r++; // 1
-            console.log("Mayor igual: pos i-"+i+" pos y:"+auxiliar+" valor: "+(-1));
+            // Darle nombre a la fila de artificiales 
+            variable_s++;
+            variable_r++;
+            C_x.push("S"+variable_s);
+
             matriz_aux [i][auxiliar] = -1;
             auxiliar++;
+            if (auxiliar >= 1) {
+                C_x.push("R"+variable_r);
+                matriz_aux [i][auxiliar] = 1;
+                auxiliar++;   
+            }
+        }else if (rest_1 == "menor_igual") {
+            variable_h++;
+            C_x.push("H"+variable_h);
 
-            //auxiliar general que es utilizado para cada var artificial, crear un auxiliar extra para
-            // el problema de la variable R, que se aregue a la matriz 
-            
-            
-        }if (rest_1 == "menor_igual") {
-            // variable_h++;
-            console.log("Menor igual: pos i-"+i+" pos y:"+auxiliar+" valor: "+1);
-            matriz_aux [i][auxiliar] = 1;
+            matriz_aux [i][auxiliar] = 1;  
             auxiliar++;
-
         }else if (rest_1 == "igual") {
-            // variable_r++; // 1            
-            console.log("igual: pos i-"+i+" pos y:"+auxiliar+" valor: "+1);
-            matriz_aux [i][auxiliar] = 1;
-            auxiliar++;
+            variable_r++;
+            C_x.push("R"+variable_r);
+
+            matriz_aux [i][auxiliar] = 1;  
+            auxiliar++;    
         }
-        
-        
-        //mensajito de las restricciones
-
-
-    }
-    console.log(matriz_aux);
-
-
-
-    
-     
-    
- 
-    
-
-    let aux = n_variables-1;
-
-    for (let i = 0; i < n_restricciones; i++) {
-        for (let y = 0; y < n_variables; y++) {
-            matriz [i][y] = document.getElementById("num_X"+(y+1)+"_Y"+(i+1)+"").value;
-        }   
-        matriz[i][n_restricciones] = document.getElementById("num_X"+(i+1)+"").value;     
     }
 
+    console.log("Variables Artificiales:")
+    console.log(C_x);
+    console.log("Matriz Auxiliar:");
+    console.log(matriz_aux); 
+
+    let var_R = [];
+    //Organizando las R al final 
+
+    let aux_2 = 0;
+    for (let i = 0; i < C_x.length; i++) {
+        if (C_x[i] == "R"+(i+1)) {
+            var_R.push("R"+(i+1)+"");
+            matriz_aux[i][aux_2]=0;
+            aux_2++;
+            C_x.splice(i, 1);
+        }
+    }
+    
+    aux_2 = 0;
+    let tam = (var_R.length+C_x.length);
+
+    for (let i = C_x.length; i < tam; i++) {
+        C_x.push("R"+(aux_2+1));
+        aux_2++;
+    }
+    C_x.unshift("Cx", "Xb")
+    C_x.push("Bi");
+    
+
+    // Agregando las variables al tamaño de la tabla
+    // document.getElementById("thead_1").innerHTML +='<tr class="table-active">';
+    // for (let i = 0; i < C_x.length; i++) {
+    //     document.getElementById("thead_1").innerHTML +='<th>'+C_x[i]+'</th>';
+    // }
+    // document.getElementById("thead_1").innerHTML +='</tr>';
+
+    console.log("Matriz:")
+    console.log(matriz);
+    
+    console.log("Matriz Auxiliar:");
+    console.log(matriz_aux);   
+    
+    console.log("Variables Artificiales:")
+    console.log(C_x);
+
+    
     // let combo = document.getElementById("objetivo_1");
     // let objetivo = combo.options[combo.selectedIndex].text;
-
     // if ( objetivo == "Maximizar") {
     //     console.log('Maximización');
-        
     // }else if (objetivo == "min") {
     //     console.log('Minimizar');
     // }
 
-    console.log("Matriz:")
-    console.log(matriz);
+        
     
 }
 

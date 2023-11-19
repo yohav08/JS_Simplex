@@ -6,8 +6,6 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-      <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-
       <title>JS-Simplex</title>
 
       <!-- Bootstrap core CSS -->
@@ -89,7 +87,7 @@ https://templatemo.com/tm-579-cyborg-gaming
                   <div class="col-lg-12">
 
                      <!-- Generar la captura de datos -->
-                     <form action=""> 
+                     <form> 
                         <div id="captura_cantidad" style="display: block;" class="heading-section">
                            <center> <h4>Ingresa los Valores</h4> </center>
                         </div>
@@ -109,7 +107,7 @@ https://templatemo.com/tm-579-cyborg-gaming
                      </form>
 
                      <!-- Captura de datos -->
-                     <form action="">
+                     <form>
                         <div id="modelo_funcion" style="display: none;">
                            <center>
                               <input  type="button" value="Editar Problema" id="Continuar" onclick="Editar()" class="btn btn-primary">&nbsp&nbsp
@@ -142,9 +140,6 @@ https://templatemo.com/tm-579-cyborg-gaming
                            </center>
                         </div>
                      </form>
-
-                     
-
                   </div>
                </div>
                <!-- ***** Solicitud de datos ***** -->
@@ -152,12 +147,13 @@ https://templatemo.com/tm-579-cyborg-gaming
 
                <!-- ***** Dos Fases ***** -->
                <div class="gaming-library">
-                  <div class="">
+                  <!-- * Modelo contextual * -->
+                  <div id="modelo_textual"  style="display: none;" >
                      <div class="heading-section">
                         <h4><em>Método de </em> las Dos Fases</h4>
                      </div>
-                     <div id="modelo_textual" style="display: block;">
-                        <div class="item">
+                     <div>
+                        <div class="item" >
                            <p style="font-size: 1.2rem; color: aliceblue;">
                               El problema se adecuará al modelo estándar de programación lineal, 
                               agregando las variables de holgura, exceso y/o artificiales en cada 
@@ -166,14 +162,69 @@ https://templatemo.com/tm-579-cyborg-gaming
                            <ol id="modelo_textual_1" ></ol>
                            <p style="font-size: 1.2rem; color: aliceblue;">
                               <br>El problema tiene variables artificiales por lo que utilizaremos el 
-                              método de las 2 fases. En la primera fase, la función objetivo busca 
-                              minimizar la suma de las variables artificiales
+                              método de las 2 fases.
                            </p>
-                        </div>
-                        
+                        </div>  
                      </div>
-                     
                   </div>
+
+                  <!-- * Primera Fase * -->
+                  <div style="border-radius: 15px;"> 
+                     <div class="heading-section">
+                        <h4><em>Solu</em>ción</h4>
+                     </div>
+                     <div>
+                        <div>
+                           <center>
+                              <div class="rounded-5">
+                                 
+                              <h5>Iteración 0</h5> <br>
+                              
+                                 <table class="table table-light" 
+                                    style="table-layout: fixed !important; 
+                                             border-radius: 8px !important; 
+                                             text-align: center !important; 
+                                             width: auto !important; ">
+                                    <thead id="thead_1">
+
+                                       <tr class="table-active">
+                                             <th>Cx</th>
+                                             <th>Xb</th>
+                                             <th>S1</th>
+                                             <th>Bi</th>
+                                       </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                       <td>0</td>
+                                       <td class="table-active">X1</td>
+                                       <td>0</td>
+                                       <td>0</td>
+                                    </tr>
+                                    <tr>
+                                       <td>0</td>
+                                       <td class="table-active">X2</td>
+                                       <td>0</td>
+                                       <td>0</td>
+                                    </tr>
+                                    </tbody>
+                                    <tfoot>
+                                       <tr>
+                                       <td></td>
+                                       <td class="table-active">z=</td>
+                                       <td></td>
+                                       <td></td>
+                                       </tr>
+                                       
+                                    </tfoot>
+                                 </table>
+                              </div>
+                           </center>
+                        </div>  
+                     </div>
+                  </div>
+
+
                </div>
                <!-- ***** Dos Fases ***** -->
 
