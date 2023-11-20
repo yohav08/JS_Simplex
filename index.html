@@ -11,9 +11,7 @@
       <!-- Bootstrap core CSS -->
       <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
       
-      <script src="js/index.js"></script>
-
-
+           
       <!-- Additional CSS Files -->
       <link rel="stylesheet" href="assets/css/fontawesome.css">
       <link rel="stylesheet" href="assets/css/templatemo-cyborg-gaming.css">
@@ -93,6 +91,11 @@ https://templatemo.com/tm-579-cyborg-gaming
                         </div>
                         <div id="captura_cantidad_1" style="display: block;" class="item">
                            <center>
+                              <select id="grafico_simplex" style="width: 200px; " onchange="Method_1();" class="form-select">
+                                 <!-- <option value="grafico">Grafico</option>  -->
+                                 <option id="simplex" >Método Simplex</option>
+                                 <option id="grafico" >Grafico</option> 
+                              </select> <br>
                               <label for="tam_variables"><h5>Cantidad de variables</h5></label>
                               <input min="2" max="20" style="width : 500px;" type="number"class="form-control" id="tam_variables" placeholder="Escriba número de Variables" required><br>
                                     
@@ -120,7 +123,7 @@ https://templatemo.com/tm-579-cyborg-gaming
 
                         <div id="modelo_restricciones" style="display: none;">
                            
-                              <div><center><br><h5>RESTRICCIONES</h5></center></div>
+                              <div><center><br><h5>SUJETO A LAS RESTRICCIONES</h5></center></div>
                               <center> 
                                  <div id="N_restriccion" class="input-group col-lg-12"> </div>
                               </center>
@@ -146,9 +149,9 @@ https://templatemo.com/tm-579-cyborg-gaming
 
 
                <!-- ***** Dos Fases ***** -->
-               <div class="gaming-library">
+               <div id="modelo_textual"  style="display: none;" class="gaming-library">
                   <!-- * Modelo contextual * -->
-                  <div id="modelo_textual"  style="display: none;" >
+                  <div>
                      <div class="heading-section">
                         <h4><em>Método de </em> las Dos Fases</h4>
                      </div>
@@ -169,7 +172,7 @@ https://templatemo.com/tm-579-cyborg-gaming
                   </div>
 
                   <!-- * Primera Fase * -->
-                  <div style="border-radius: 15px;"> 
+                  <div id="modelo_simplex_2"  style="display: none;"> 
                      <div class="heading-section">
                         <h4><em>Solu</em>ción</h4>
                      </div>
@@ -186,6 +189,13 @@ https://templatemo.com/tm-579-cyborg-gaming
                                              text-align: center !important; 
                                              width: auto !important; ">
                                     <thead id="thead_1">
+
+                                       <tr>
+                                          <th></th>
+                                          <th class="table-active">Cj</th>
+                                          <th></th>
+                                          <th></th>
+                                       </tr>
 
                                        <tr class="table-active">
                                              <th>Cx</th>
@@ -223,30 +233,49 @@ https://templatemo.com/tm-579-cyborg-gaming
                         </div>  
                      </div>
                   </div>
-
-
                </div>
                <!-- ***** Dos Fases ***** -->
 
 
 
                <!-- ***** Gráfico ***** -->
-               <div class="gaming-library">
-                  <div class="col-lg-12">
+               <div id="modelo_grafic"  style="display: block;" class="gaming-library">
+                  <div id="modelo_grafic" >
                      <div class="heading-section">
-                        <h4><em>Método de </em> Gráfico</h4>
+                        <h4><em>Método G</em>ráfico</h4>
                      </div>
-                     <div class="item">
-                        <ul>
-                        <li><img src="assets/images/game-01.jpg" alt="" class="templatemo-item"></li>
-                        <li><h4>Dota 2</h4><span>Sandbox</span></li>
-                        <li><h4>Date Added</h4><span>24/08/2036</span></li>
-                        <li><h4>Hours Played</h4><span>634 H 22 Mins</span></li>
-                        <li><h4>Currently</h4><span>Downloaded</span></li>
-                        <li><div class="main-border-button border-no-active"><a href="#">Donwloaded</a></div></li>
-                        </ul>
+                     
+                     <div class="item" >
+                        <div><br><h5>Función Objetivo:</h5></div>
+                        <p  id="Fun_objetivo" style="font-size: 1.2rem; color: aliceblue;"></p>
+
+                        <div><br><h5>Sujeto a :</h5></div>
+                        <p  id="Res_objetivo" style="font-size: 1.2rem; color: aliceblue;"></p>
+                        <br>
+                        <center>
+                           <table class="table table-light" style="text-align: center;">
+                              <thead>
+                              <tr class="table-primary">
+                                 <th scope="col">Punto <br>...</th>
+                                 <th scope="col">Coordenadas <br> (X,Y)</th>
+                                 <th scope="col">Valor de la función objetivo <br>Z = X + Y</th>
+                              </tr>
+                              </thead>
+                              <tbody>
+                              <tr>
+                                 <th>0</th>
+                                 <td>1</td>
+                                 <td>2</td>
+                              </tr>
+                              </tbody>
+                           </table>
+                        </center>
                      </div>
-                  </div>
+                     <center>
+                        <div id="contenedor_grafica" class="container"> </div>
+                     </center>
+                     
+                  </div> 
                   <div class="col-lg-12">
                      <div class="main-button">
                         <a href="#">Volver Arriba</a>
@@ -278,7 +307,9 @@ https://templatemo.com/tm-579-cyborg-gaming
    <script src="vendor/bootstrap/js/bootstrap.min.js"></script>
    <script src="assets/js/custom.js"></script>
 
-
+   <!-- CHART JS -->
+   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+   <script src="js/index.js"></script>
   </body>
 
 </html>
