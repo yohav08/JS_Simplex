@@ -153,7 +153,7 @@ function Generar_simplex(){
     let C_x = [];
 
     auxiliar = 0;
-    //Agregando las variables artificiales a la matriz
+    //Agregando las variables artificiales S y H a la matriz
     for (let i = 0; i < n_restricciones; i++) {
         let combo_1 = document.getElementById("variables_adicionales"+(i+1));
         let rest_1 = combo_1.options[combo_1.selectedIndex].value;
@@ -174,7 +174,7 @@ function Generar_simplex(){
             auxiliar++;
         }
     }
-
+    //Agregando las variables artificiales R a la matriz
     for (let i = 0; i < n_restricciones; i++) {
         let combo_1 = document.getElementById("variables_adicionales"+(i+1));
         let rest_1 = combo_1.options[combo_1.selectedIndex].value;
@@ -196,40 +196,25 @@ function Generar_simplex(){
         }
     }
 
-    console.log("----------Variables Artificiales:")
-    console.log(C_x);
-    console.log("----------Matriz Auxiliar:");
-    console.log(matriz_aux); 
-
-    let var_R = [];
-    //Organizando las R al final en el arreglo 
-    /* 
-    for (let i = 0; i < C_x.length; i++) {
-        if (C_x[i] == "R"+(i+1)) {
-
-            var_R.push("R"+(i+1)+"");
-            C_x.splice(i, 1);
-        } 
-    }
-    let aux_2 = 0;
-    let tam = (var_R.length+C_x.length);
-
-    for (let i = C_x.length; i < tam; i++) {
-        C_x.push("R"+(aux_2+1));
-        aux_2++;
-    }
-    */
-
-    // C_x.unshift("Cx", "Xb")
-    // C_x.push("Bi");
+    C_x.unshift("Cx", "Xb")
+    C_x.push("Bi");
     
 
-    // Agregando las variables al tamaño de la tabla
+    /**
+     * Todo: Agregando las variables al tamaño de la tabla
+     *  
+    */
+
+
+
     // document.getElementById("thead_1").innerHTML +='<tr class="table-active">';
     // for (let i = 0; i < C_x.length; i++) {
     //     document.getElementById("thead_1").innerHTML +='<th>'+C_x[i]+'</th>';
     // }
     // document.getElementById("thead_1").innerHTML +='</tr>';
+
+    console.log("Matriz:");
+    console.log(matriz);   
 
     console.log("Matriz Auxiliar:");
     console.log(matriz_aux);   
