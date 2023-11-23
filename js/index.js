@@ -122,7 +122,7 @@ function Generar_simplex(){
     }
 
     //Creando matriz dinámica para capturar el modelo
-    let matriz = new Array(n_restricciones);
+    let matriz = new Array(n_restricciones-1);
     for (let i = 0; i < n_restricciones; i++) {
         matriz[i] = new Array(n_variables+1);
     }
@@ -180,9 +180,7 @@ function Generar_simplex(){
         let rest_1 = combo_1.options[combo_1.selectedIndex].value;
 
         if (rest_1 == "mayor_igual") {
-            // Darle nombre a la fila de artificiales 
             variable_r++;
-
             C_x.push("R"+variable_r);
             matriz_aux [i][auxiliar] = 1;
             auxiliar++;   
@@ -190,28 +188,112 @@ function Generar_simplex(){
         }else if (rest_1 == "igual") {
             variable_r++;
             C_x.push("R"+variable_r);
-
             matriz_aux [i][auxiliar] = 1;  
             auxiliar++;    
         }
     }
 
+    
+    for (let i = n_variables-1; i >= 0; i--) {
+        C_x.unshift("X"+(i+1));        
+    }
     C_x.unshift("Cx", "Xb")
     C_x.push("Bi");
     
 
-    /**
-     * Todo: Agregando las variables al tamaño de la tabla
-     *  
-    */
+    let combo = document.getElementById("objetivo_1");
+    let objetivo = combo.options[combo.selectedIndex].text;
+
+    // ENCABEZADO DE LA MATRIZ INICIAL
+    document.getElementById("thead_encabezado").innerHTML = '';
+    document.getElementById("thead_encabezado").innerHTML += '<tr id="encabezado_1">';
+    for (let i = 0; i < C_x.length; i++) {
+        if (i==0) {
+            document.getElementById("encabezado_1").innerHTML +='<th class="table-active"></th>';
+        }else if (i==1) {
+            document.getElementById("encabezado_1").innerHTML +='<th class="table-active">Cj</th>';
+        }else if (C_x[i].charAt(0) == "R" ) {
+            if ( objetivo == "Maximizar"){
+                document.getElementById("encabezado_1").innerHTML +='<th id="Max_'+C_x[i]+'">-1</th>';
+            }else if (objetivo == "Minimizar") {
+                document.getElementById("encabezado_1").innerHTML +='<th id="Min_'+C_x[i]+'">1</th>';
+            }
+        }
+        else{
+            document.getElementById("encabezado_1").innerHTML +='<th>0</th>';
+        }        
+    } document.getElementById("thead_encabezado").innerHTML +='</tr>';
+    
+    document.getElementById("thead_encabezado").innerHTML +='<tr id="encabezado_2" class="table-active">';
+    for (let i = 0; i < C_x.length; i++) {
+        document.getElementById("encabezado_2").innerHTML +='<th>'+C_x[i]+'</th>';
+    } document.getElementById("thead_encabezado").innerHTML +='</tr>';
+
+    // BODY - INSERSIÓN DE LA MATRIZ LAS VARIABLES ARTIFICIALES ETC.
+    document.getElementById("tbody_matriz").innerHTML = '';
+    auxiliar = 0;
+    for (let i = 0; i < C_x.length; i++) {
+        document.getElementById("tbody_matriz").innerHTML += '<tr id="tbody_matriz_'+(auxiliar+1)+'">';
+        if (C_x[i].charAt(0) == "R" ) {
+            if ( objetivo == "Maximizar"){
+                document.getElementById('tbody_matriz_'+(auxiliar+1)+'').innerHTML +='<th id="Max_'+C_x[i]+'">-1</th>';
+                document.getElementById('tbody_matriz_'+(auxiliar+1)+'').innerHTML +='<th class="table-active">'+C_x[i]+'</th>';                
+                auxiliar++;
+            }else if (objetivo == "Minimizar") {
+                document.getElementById('tbody_matriz_'+(auxiliar+1)+'').innerHTML +='<th id="Min_'+C_x[i]+'">1</th>';
+                document.getElementById('tbody_matriz_'+(auxiliar+1)+'').innerHTML +='<th class="table-active">'+C_x[i]+'</th>';  
+                auxiliar++;
+            }
+        }else if(C_x[i].charAt(0) == "H") {
+            if ( objetivo == "Maximizar"){
+                document.getElementById('tbody_matriz_'+(auxiliar+1)+'').innerHTML +='<th id="Max_'+C_x[i]+'">0</th>';
+                document.getElementById('tbody_matriz_'+(auxiliar+1)+'').innerHTML +='<th class="table-active">'+C_x[i]+'</th>';  
+                auxiliar++;
+            }else if (objetivo == "Minimizar") {
+                document.getElementById('tbody_matriz_'+(auxiliar+1)+'').innerHTML +='<th id="Min_'+C_x[i]+'">0</th>';
+                document.getElementById('tbody_matriz_'+(auxiliar+1)+'').innerHTML +='<th class="table-active">'+C_x[i]+'</th>';  
+                auxiliar++;
+            }
+        }
+        document.getElementById("tbody_matriz").innerHTML +='</tr>'; 
+    }
+
+    for (let i = 0; i < n_restricciones; i++) {
+        document.getElementById("tbody_matriz").innerHTML += '<tr id="tbody_matriz_'+(i+1)+'">';
+        for (let y = 0; y < n_variables; y++) {
+            document.getElementById('tbody_matriz_'+(i+1)+'').innerHTML +='<th>'+matriz[i][y]+'</th>';            
+        }
+        document.getElementById("tbody_matriz").innerHTML +='</tr>';  
+    }
+    
+    for (let i = 0; i < n_restricciones ; i++) {
+        document.getElementById("tbody_matriz").innerHTML += '<tr id="tbody_matriz_'+(i+1)+'">';
+        for (let y = 0; y < variable_aux; y++) {
+            document.getElementById('tbody_matriz_'+(i+1)+'').innerHTML +='<th>'+matriz_aux[i][y]+'</th>';            
+        }
+        document.getElementById("tbody_matriz").innerHTML +='</tr>'; 
+    }
+
+    for (let i = 0; i < n_restricciones; i++) {
+        document.getElementById("tbody_matriz").innerHTML += '<tr id="tbody_matriz_'+(i+1)+'">';
+        for (let y = n_variables; y <= n_variables; y++) {
+            document.getElementById('tbody_matriz_'+(i+1)+'').innerHTML +='<th>'+matriz[i][y]+'</th>';            
+        } 
+        document.getElementById("tbody_matriz").innerHTML +='</tr>'; 
+    }
 
 
+    // FOTTER DE LA MATRIZ INICIAL
+    document.getElementById("tfoot_end").innerHTML = '';
+    document.getElementById("tfoot_end").innerHTML += '<tr id="tfoot_end_2">';
+    for (let i = 0; i < C_x.length; i++) {
+        if (i==1) {
+            document.getElementById("tfoot_end_2").innerHTML +='<th class="table-active"> Z = </th>';
+        }else{
+            document.getElementById("tfoot_end_2").innerHTML +='<th></th>';
+        }        
+    } document.getElementById("tfoot_end").innerHTML +='</tr>';
 
-    // document.getElementById("thead_1").innerHTML +='<tr class="table-active">';
-    // for (let i = 0; i < C_x.length; i++) {
-    //     document.getElementById("thead_1").innerHTML +='<th>'+C_x[i]+'</th>';
-    // }
-    // document.getElementById("thead_1").innerHTML +='</tr>';
 
     console.log("Matriz:");
     console.log(matriz);   
