@@ -270,18 +270,24 @@ function Generar_simplex(){
         document.getElementById("tbody_matriz").innerHTML += '<tr id="tbody_matriz_'+(auxiliar+1)+'">';
         if (C_x[i].charAt(0) == "R" ) {
             if ( objetivo == "Maximizar"){
-                document.getElementById('tbody_matriz_'+(auxiliar+1)+'').innerHTML +='<th>-1</th>';
+                document.getElementById('tbody_matriz_'+(auxiliar+1)+'').innerHTML +='<th id="Max_'+C_x[i]+'">-1</th>';
                 document.getElementById('tbody_matriz_'+(auxiliar+1)+'').innerHTML +='<th class="table-active">'+C_x[i]+'</th>';                
                 auxiliar++;
             }else if (objetivo == "Minimizar") {
-                document.getElementById('tbody_matriz_'+(auxiliar+1)+'').innerHTML +='<th>1</th>';
+                document.getElementById('tbody_matriz_'+(auxiliar+1)+'').innerHTML +='<th id="Min_'+C_x[i]+'">1</th>';
                 document.getElementById('tbody_matriz_'+(auxiliar+1)+'').innerHTML +='<th class="table-active">'+C_x[i]+'</th>';  
                 auxiliar++;
             }
         }else if(C_x[i].charAt(0) == "H") {
-            document.getElementById('tbody_matriz_'+(auxiliar+1)+'').innerHTML +='<th>0</th>';
-            document.getElementById('tbody_matriz_'+(auxiliar+1)+'').innerHTML +='<th class="table-active">'+C_x[i]+'</th>';  
-            auxiliar++;
+            if ( objetivo == "Maximizar"){
+                document.getElementById('tbody_matriz_'+(auxiliar+1)+'').innerHTML +='<th id="Max_'+C_x[i]+'">0</th>';
+                document.getElementById('tbody_matriz_'+(auxiliar+1)+'').innerHTML +='<th class="table-active">'+C_x[i]+'</th>';  
+                auxiliar++;
+            }else if (objetivo == "Minimizar") {
+                document.getElementById('tbody_matriz_'+(auxiliar+1)+'').innerHTML +='<th id="Min_'+C_x[i]+'">0</th>';
+                document.getElementById('tbody_matriz_'+(auxiliar+1)+'').innerHTML +='<th class="table-active">'+C_x[i]+'</th>';  
+                auxiliar++;
+            }
         }
         document.getElementById("tbody_matriz").innerHTML +='</tr>'; 
     }
@@ -296,27 +302,20 @@ function Generar_simplex(){
         document.getElementById("tbody_matriz").innerHTML +='</tr>';  
     }
     // INSERTANDO LOS BI
-    document.getElementById("tbody_matriz").innerHTML += '<tr id="tbody_mat">';
+    
     for (let i = 0; i < n_restricciones; i++) {
-        document.getElementById('tbody_mat').innerHTML +='<th>'+B_i[i]+'</th>';
+        document.getElementById("tbody_matriz").innerHTML += '<tr id="tbody_matriz_'+(i+1)+'">';
+        document.getElementById('tbody_matriz_'+(i+1)+'').innerHTML +='<th>'+B_i[i]+'</th>';
+        document.getElementById("tbody_matriz").innerHTML +='</tr>'; 
     }
-    document.getElementById("tbody_matriz").innerHTML +='</tr>'; 
+     
 
     // FOTTER DE LA MATRIZ_FINAL
     document.getElementById("tfoot_end").innerHTML += '<tr id="tfoot_end_2">';
     for (let i = 0; i < C_x.length; i++) {
-        if (i=0) {
-            document.getElementById("tfoot_end_2").innerHTML +='<th></th>';
-        }else if (i==1) {
+        if (i==1) {
             document.getElementById("tfoot_end_2").innerHTML +='<th class="table-active"> Z = </th>';
         }else{
-        //  if (C_x[i].charAt(0) == "R" ) {
-        //         if ( objetivo == "Maximizar"){
-        //             document.getElementById("tfoot_end_2").innerHTML +='<th>hola</th>';
-        //         }else if (objetivo == "Minimizar") {
-        //             document.getElementById("tfoot_end_2").innerHTML +='<th></th>';
-        //         }
-        //     }else if(C_x[i].charAt(0) == "H") {
             document.getElementById("tfoot_end_2").innerHTML +='<th></th>';
             
         }        
