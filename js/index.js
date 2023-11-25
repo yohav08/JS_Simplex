@@ -88,6 +88,7 @@ function Method_1() {
 
 function Generar_simplex(){
 
+
     document.getElementById("modelo_textual").style = "display: block";
 
     // #filas
@@ -95,10 +96,16 @@ function Generar_simplex(){
     // #columnas
     let n_restricciones = parseFloat(document.getElementById("tam_restricciones").value);
     // # de variables artificiales
-    let variable_r = 0, variable_s = 0, variable_h = 0, auxiliar = 0;
+    let variable_r = 0;
+    let variable_s = 0
+    let variable_h = 0
+    let auxiliar = 0;
 
-    // Reiniciando las variables textuales agregadas
+    // Reiniciando el modelo agregado
     document.getElementById("modelo_textual_1").innerHTML ='';
+    document.getElementById("thead_encabezado").innerHTML = '';
+    document.getElementById("tbody_matriz").innerHTML = '';
+    document.getElementById("tfoot_end").innerHTML = '';
     
     //Agregando modelo textual de las variables artificiales que se trabajarán
     for (let i = 0; i < n_restricciones; i++) {
@@ -121,39 +128,43 @@ function Generar_simplex(){
         }
     }
 
-    //Creando matriz dinámica para capturar el modelo
-    let matriz = new Array(n_restricciones-1);
+    //Creando matriz_inicial dinámica para capturar el modelo
+    let matriz_inicial = new Array(n_restricciones-1);
     for (let i = 0; i < n_restricciones; i++) {
-        matriz[i] = new Array(n_variables+1);
+        matriz_inicial[i] = new Array(n_variables);
     }
-    //Creando la matriz con los respectivos valores extraídos del modelo
+    //Creando la matriz_inicial con los respectivos valores extraídos del modelo
     for (let i = 0; i < n_restricciones; i++) {
         for (let y = 0; y <n_variables; y++) {
-            matriz [i][y] = parseFloat(document.getElementById("num_X"+(y+1)+"_Y"+(i+1)+"").value);
+            matriz_inicial [i][y] = parseFloat(document.getElementById("num_X"+(y+1)+"_Y"+(i+1)+"").value);
         }   
-        matriz[i][n_restricciones] = parseFloat(document.getElementById("num_X"+(i+1)+"").value);     
+        matriz_inicial[i][n_variables] = parseFloat(document.getElementById("num_X"+(i+1)+"").value);     
     }
 
     // Contando el número de variables artificiales, de Superavit y Holgura que se agregarán
     let variable_aux = variable_r+ variable_s+variable_h;
 
-    // Creando matriz dinámica con las variables artificiales
+    // Creando matriz_aux dinámica con las variables artificiales
     let matriz_aux = new Array(n_restricciones);
     for (let i = 0; i < n_restricciones; i++) {
         matriz_aux[i] = new Array(variable_aux);
     }
-    // Rellenando la Matriz de ceros para agregar las variables artificales
+    // Rellenando la matriz_aux de ceros para agregar las variables artificales
     for (let i = 0; i < n_restricciones; i++) {
         for (let y = 0; y < variable_aux; y++) {
             matriz_aux[i][y]= 0 ;
         }
     }
 
-    variable_h = 0; variable_r = 0; variable_s = 0;
+    // Reiniciando los contadores
+    variable_h = 0; 
+    variable_r = 0; 
+    variable_s = 0;
+    auxiliar = 0;
+    // Declarando arreglo que contiene los nombres de las variables(en texto))
     let C_x = [];
 
-    auxiliar = 0;
-    //Agregando las variables artificiales S y H a la matriz
+    //Agregando las variables artificiales S y H a la matriz_auxiliar
     for (let i = 0; i < n_restricciones; i++) {
         let combo_1 = document.getElementById("variables_adicionales"+(i+1));
         let rest_1 = combo_1.options[combo_1.selectedIndex].value;
@@ -174,7 +185,7 @@ function Generar_simplex(){
             auxiliar++;
         }
     }
-    //Agregando las variables artificiales R a la matriz
+    //Agregando las variables artificiales R a la matriz_auxiliar 
     for (let i = 0; i < n_restricciones; i++) {
         let combo_1 = document.getElementById("variables_adicionales"+(i+1));
         let rest_1 = combo_1.options[combo_1.selectedIndex].value;
@@ -193,19 +204,41 @@ function Generar_simplex(){
         }
     }
 
-    
+    //Agregando los nombres de las variables
     for (let i = n_variables-1; i >= 0; i--) {
         C_x.unshift("X"+(i+1));        
     }
     C_x.unshift("Cx", "Xb")
     C_x.push("Bi");
     
+    //Creando matriz_final para el modelo completo
+    auxiliar = n_variables+variable_aux;
+    let matriz_final = new Array(n_restricciones-1);
+    for (let i = 0; i < n_restricciones; i++) {
+        matriz_final[i] = new Array(auxiliar);
+    }
+
+    //Creando la matriz_final completa sin Bi
+    for (let i = 0; i < n_restricciones; i++) {
+        for (let y = 0; y <n_variables; y++) {
+            matriz_final [i][y] = matriz_inicial [i][y];
+        }    
+    }
+    for (let i = 0; i < n_restricciones; i++) {
+        for (let y = n_variables; y < auxiliar; y++) {
+            matriz_final [i][y] = matriz_aux [i][y-n_variables];
+        }
+    }
+    // Extrayendo los valores de Bi
+    let B_i = new Array(n_variables);
+    for (let i = 0; i < n_restricciones; i++) {
+        B_i[i] = parseFloat(document.getElementById("num_X"+(i+1)+"").value);        
+    }
 
     let combo = document.getElementById("objetivo_1");
     let objetivo = combo.options[combo.selectedIndex].text;
 
-    // ENCABEZADO DE LA MATRIZ INICIAL
-    document.getElementById("thead_encabezado").innerHTML = '';
+    // ENCABEZADO DE LA MATRIZ_FINAL 
     document.getElementById("thead_encabezado").innerHTML += '<tr id="encabezado_1">';
     for (let i = 0; i < C_x.length; i++) {
         if (i==0) {
@@ -214,106 +247,88 @@ function Generar_simplex(){
             document.getElementById("encabezado_1").innerHTML +='<th class="table-active">Cj</th>';
         }else if (C_x[i].charAt(0) == "R" ) {
             if ( objetivo == "Maximizar"){
-                document.getElementById("encabezado_1").innerHTML +='<th id="Max_'+C_x[i]+'">-1</th>';
+                document.getElementById("encabezado_1").innerHTML +='<th>-1</th>';
             }else if (objetivo == "Minimizar") {
-                document.getElementById("encabezado_1").innerHTML +='<th id="Min_'+C_x[i]+'">1</th>';
+                document.getElementById("encabezado_1").innerHTML +='<th>1</th>';
             }
         }
         else{
             document.getElementById("encabezado_1").innerHTML +='<th>0</th>';
         }        
-    } document.getElementById("thead_encabezado").innerHTML +='</tr>';
-    
+    } 
+    document.getElementById("thead_encabezado").innerHTML +='</tr>';
     document.getElementById("thead_encabezado").innerHTML +='<tr id="encabezado_2" class="table-active">';
     for (let i = 0; i < C_x.length; i++) {
         document.getElementById("encabezado_2").innerHTML +='<th>'+C_x[i]+'</th>';
-    } document.getElementById("thead_encabezado").innerHTML +='</tr>';
+    } 
+    document.getElementById("thead_encabezado").innerHTML +='</tr>';
 
     // BODY - INSERSIÓN DE LA MATRIZ LAS VARIABLES ARTIFICIALES ETC.
-    document.getElementById("tbody_matriz").innerHTML = '';
+    // Reiniciando contador
     auxiliar = 0;
     for (let i = 0; i < C_x.length; i++) {
         document.getElementById("tbody_matriz").innerHTML += '<tr id="tbody_matriz_'+(auxiliar+1)+'">';
         if (C_x[i].charAt(0) == "R" ) {
             if ( objetivo == "Maximizar"){
-                document.getElementById('tbody_matriz_'+(auxiliar+1)+'').innerHTML +='<th id="Max_'+C_x[i]+'">-1</th>';
+                document.getElementById('tbody_matriz_'+(auxiliar+1)+'').innerHTML +='<th>-1</th>';
                 document.getElementById('tbody_matriz_'+(auxiliar+1)+'').innerHTML +='<th class="table-active">'+C_x[i]+'</th>';                
                 auxiliar++;
             }else if (objetivo == "Minimizar") {
-                document.getElementById('tbody_matriz_'+(auxiliar+1)+'').innerHTML +='<th id="Min_'+C_x[i]+'">1</th>';
+                document.getElementById('tbody_matriz_'+(auxiliar+1)+'').innerHTML +='<th>1</th>';
                 document.getElementById('tbody_matriz_'+(auxiliar+1)+'').innerHTML +='<th class="table-active">'+C_x[i]+'</th>';  
                 auxiliar++;
             }
         }else if(C_x[i].charAt(0) == "H") {
-            if ( objetivo == "Maximizar"){
-                document.getElementById('tbody_matriz_'+(auxiliar+1)+'').innerHTML +='<th id="Max_'+C_x[i]+'">0</th>';
-                document.getElementById('tbody_matriz_'+(auxiliar+1)+'').innerHTML +='<th class="table-active">'+C_x[i]+'</th>';  
-                auxiliar++;
-            }else if (objetivo == "Minimizar") {
-                document.getElementById('tbody_matriz_'+(auxiliar+1)+'').innerHTML +='<th id="Min_'+C_x[i]+'">0</th>';
-                document.getElementById('tbody_matriz_'+(auxiliar+1)+'').innerHTML +='<th class="table-active">'+C_x[i]+'</th>';  
-                auxiliar++;
-            }
+            document.getElementById('tbody_matriz_'+(auxiliar+1)+'').innerHTML +='<th>0</th>';
+            document.getElementById('tbody_matriz_'+(auxiliar+1)+'').innerHTML +='<th class="table-active">'+C_x[i]+'</th>';  
+            auxiliar++;
         }
         document.getElementById("tbody_matriz").innerHTML +='</tr>'; 
     }
 
+    // INSERTANDO LA MATRIZ_FINAL
+    auxiliar = n_variables+variable_aux;
     for (let i = 0; i < n_restricciones; i++) {
         document.getElementById("tbody_matriz").innerHTML += '<tr id="tbody_matriz_'+(i+1)+'">';
-        for (let y = 0; y < n_variables; y++) {
-            document.getElementById('tbody_matriz_'+(i+1)+'').innerHTML +='<th>'+matriz[i][y]+'</th>';            
+        for (let y = 0; y < auxiliar; y++) {
+            document.getElementById('tbody_matriz_'+(i+1)+'').innerHTML +='<th>'+matriz_final[i][y]+'</th>';            
         }
         document.getElementById("tbody_matriz").innerHTML +='</tr>';  
     }
-    
-    for (let i = 0; i < n_restricciones ; i++) {
-        document.getElementById("tbody_matriz").innerHTML += '<tr id="tbody_matriz_'+(i+1)+'">';
-        for (let y = 0; y < variable_aux; y++) {
-            document.getElementById('tbody_matriz_'+(i+1)+'').innerHTML +='<th>'+matriz_aux[i][y]+'</th>';            
-        }
-        document.getElementById("tbody_matriz").innerHTML +='</tr>'; 
-    }
-
+    // INSERTANDO LOS BI
+    document.getElementById("tbody_matriz").innerHTML += '<tr id="tbody_mat">';
     for (let i = 0; i < n_restricciones; i++) {
-        document.getElementById("tbody_matriz").innerHTML += '<tr id="tbody_matriz_'+(i+1)+'">';
-        for (let y = n_variables; y <= n_variables; y++) {
-            document.getElementById('tbody_matriz_'+(i+1)+'').innerHTML +='<th>'+matriz[i][y]+'</th>';            
-        } 
-        document.getElementById("tbody_matriz").innerHTML +='</tr>'; 
+        document.getElementById('tbody_mat').innerHTML +='<th>'+B_i[i]+'</th>';
     }
+    document.getElementById("tbody_matriz").innerHTML +='</tr>'; 
 
-
-    // FOTTER DE LA MATRIZ INICIAL
-    document.getElementById("tfoot_end").innerHTML = '';
+    // FOTTER DE LA MATRIZ_FINAL
     document.getElementById("tfoot_end").innerHTML += '<tr id="tfoot_end_2">';
     for (let i = 0; i < C_x.length; i++) {
-        if (i==1) {
+        if (i=0) {
+            document.getElementById("tfoot_end_2").innerHTML +='<th></th>';
+        }else if (i==1) {
             document.getElementById("tfoot_end_2").innerHTML +='<th class="table-active"> Z = </th>';
         }else{
+        //  if (C_x[i].charAt(0) == "R" ) {
+        //         if ( objetivo == "Maximizar"){
+        //             document.getElementById("tfoot_end_2").innerHTML +='<th>hola</th>';
+        //         }else if (objetivo == "Minimizar") {
+        //             document.getElementById("tfoot_end_2").innerHTML +='<th></th>';
+        //         }
+        //     }else if(C_x[i].charAt(0) == "H") {
             document.getElementById("tfoot_end_2").innerHTML +='<th></th>';
+            
         }        
-    } document.getElementById("tfoot_end").innerHTML +='</tr>';
+    } 
+    document.getElementById("tfoot_end").innerHTML +='</tr>';
 
 
-    console.log("Matriz:");
-    console.log(matriz);   
 
-    console.log("Matriz Auxiliar:");
-    console.log(matriz_aux);   
-    
-    console.log("Variables Artificiales:")
-    console.log(C_x);
-
-    
-    // let combo = document.getElementById("objetivo_1");
-    // let objetivo = combo.options[combo.selectedIndex].text;
-    // if ( objetivo == "Maximizar") {
-    //     console.log('Maximización');
-    // }else if (objetivo == "min") {
-    //     console.log('Minimizar');
-    // }
-
-        
+    console.log("Matriz Final sin BI:");
+    console.log(matriz_final); 
+    console.log("B_I:");
+    console.log(B_i);    
     
 }
 
