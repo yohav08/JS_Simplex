@@ -1619,6 +1619,9 @@ body {
 }
 
 th, td {
-  width: 100px;
-  word-wrap: break-word;
+  width: 110px;
+}
+
+.scrollme {
+  overflow-x: auto;
 }
