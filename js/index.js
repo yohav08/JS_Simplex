@@ -392,7 +392,7 @@ function Generar_simplex(){
 
     // Determinar el elemento Pivote
     let columna_pivote = 0;
-    let fila_pivote = 0
+    let fila_pivote = 0;
 
     // Determinando el elemento pivote de la matriz
     auxiliar = tam_matriz -1;
@@ -419,7 +419,7 @@ function Generar_simplex(){
                 fila_pivote = i;
             }
         }
-        document.getElementById("col_pivote_inicial").innerHTML = C_x[fila_pivote];
+        document.getElementById("col_pivote_inicial").innerHTML = C_x[fila_pivote-1];
         document.getElementById("fil_pivote_inicial").innerHTML = val_Xb[fila_pivote];
         document.getElementById("elem_pivote_inicial").innerHTML = matriz_final[fila_pivote][columna_pivote];
 
@@ -446,17 +446,16 @@ function Generar_simplex(){
                 fila_pivote = i;
             }
         }
-        document.getElementById("col_pivote_inicial").innerHTML = C_x[fila_pivote];
+        document.getElementById("col_pivote_inicial").innerHTML = C_x[fila_pivote-1];
         document.getElementById("fil_pivote_inicial").innerHTML = val_Xb[fila_pivote];
         document.getElementById("elem_pivote_inicial").innerHTML = matriz_final[fila_pivote][columna_pivote];
     }
 
-    // Primera fase 
+    // PROGRAMANDO LA PRIMERA FASE
     let validacion_max = false;
     let validacion_min = false;
 
 
-    let val_Cx_auxiliar = val_Cx;
     let val_Xb_auxiliar = val_Xb;
     let matriz_final_auxiliar = matriz_final;
     let B_i_auxiliar = B_i;
@@ -466,67 +465,93 @@ function Generar_simplex(){
     
     if ( objetivo == "Maximizar"){
         auxiliar = 0;
-        while (validacion_max == false) {
-
-
-            // ENCABEZADO DE LAS TAVLAS DE SEGUNDA FASE
-            let largo_tabla = C_x.length+2;
+        // while (validacion_max == false) {
             
-
+        while (auxiliar < 2) {
+            // ENCABEZADO DE LAS TABLAS DE SEGUNDA FASE
+            // Titulo tabla
             document.getElementById("primera_fase").innerHTML += '<center> <br> <h5>Iteración Num. '+(auxiliar+1)+'</h5> <br> </center>';
             
+            // tabla numerada por cada iteración de 
             document.getElementById("primera_fase").innerHTML += '<table id="tabla_'+(auxiliar+1)+'" class="table table-light" style="table-layout: fixed !important; border-radius: 8px !important; text-align: center !important; width: auto !important; " >';
-            
-            document.getElementById("tabla_"+(auxiliar+1)).innerHTML += '<thead id="thead_encabezado'+(auxiliar+1)+'"> </thead>';
-            document.getElementById("tabla_"+(auxiliar+1)).innerHTML += '<tbody id="tbody_matriz'+(auxiliar+1)+'"></tbody>';
-            document.getElementById("tabla_"+(auxiliar+1)).innerHTML += '<tfoot id="tfoot_end'+(auxiliar+1)+'"> </tfoot>';
+            document.getElementById("tabla_"+(auxiliar+1)).innerHTML += '<thead id="thead_encab'+(auxiliar+1)+'"> </thead>';
+            document.getElementById("tabla_"+(auxiliar+1)).innerHTML += '<tbody id="tbody_mat'+(auxiliar+1)+'"></tbody>';
+            document.getElementById("tabla_"+(auxiliar+1)).innerHTML += '<tfoot id="tfoot_final'+(auxiliar+1)+'"> </tfoot>';
+            document.getElementById("primera_fase").innerHTML += '</table>';
 
-
-            document.getElementById("thead_encabezado").innerHTML += '<tr id="encabezado_1">';
+            // largo_tabla = C_x.length+2;
+            // Agregando encabezado 1 para cada tabla
+            document.getElementById("thead_encab"+(auxiliar+1)).innerHTML += '<tr id="encab_'+(auxiliar+1)+'">';
             for (let i = 0; i < largo_tabla; i++) {
                 if (i==0) {
-                    document.getElementById("encabezado_1").innerHTML +='<th class="table-active"></th>';
+                    document.getElementById("encab_"+(auxiliar+1)).innerHTML +='<th class="table-active"></th>';
                 }else if (i==1) {
-                    document.getElementById("encabezado_1").innerHTML +='<th class="table-active">Cj</th>';
+                    document.getElementById("encab_"+(auxiliar+1)).innerHTML +='<th class="table-active">Cj</th>';
                 }else if (C_x[i-2].charAt(0) == "R" ) {
-                    if ( objetivo == "Maximizar"){
-                        document.getElementById("encabezado_1").innerHTML +='<th>-1</th>';
-                    }else if (objetivo == "Minimizar") {
-                        document.getElementById("encabezado_1").innerHTML +='<th>1</th>';
-                    }
+                    // Maximizar (-1) y Minimizar (+1)
+                    document.getElementById("encab_"+(auxiliar+1)).innerHTML +='<th>-1</th>';
                 } else{
-                    document.getElementById("encabezado_1").innerHTML +='<th>0</th>';
+                    document.getElementById("encab_"+(auxiliar+1)).innerHTML +='<th>0</th>';
                 }        
             } 
-            document.getElementById("thead_encabezado").innerHTML +='</tr>';
+            document.getElementById("thead_encab"+(auxiliar+1)).innerHTML +='</tr>';
 
-            document.getElementById("thead_encabezado").innerHTML +='<tr id="encabezado_2" class="table-active">';
+            // Agregando encabezado 2
+            document.getElementById("thead_encab"+(auxiliar+1)).innerHTML +='<tr id="encab_0'+(auxiliar+1)+'" class="table-active">';
             for (let i = 0; i < largo_tabla; i++) {
                 if (i==0) {
-                    document.getElementById("encabezado_2").innerHTML +='<th class="table-active">Cx</th>';
+                    document.getElementById("encab_0"+(auxiliar+1)).innerHTML +='<th class="table-active">Cx</th>';
                 }else if (i==1) {
-                    document.getElementById("encabezado_2").innerHTML +='<th class="table-active">Xb</th>';
+                    document.getElementById("encab_0"+(auxiliar+1)).innerHTML +='<th class="table-active">Xb</th>';
                 }else{
-                    document.getElementById("encabezado_2").innerHTML +='<th>'+C_x[i-2]+'</th>';
+                    document.getElementById("encab_0"+(auxiliar+1)).innerHTML +='<th>'+C_x[i-2]+'</th>';
                 }
             } 
-            document.getElementById("thead_encabezado").innerHTML +='</tr>';
+            document.getElementById("thead_encab"+(auxiliar+1)).innerHTML +='</tr>';
+
+            // BODY - INSERSIÓN DE LA MATRIZ LAS VARIABLES ARTIFICIALES ETC.
+
+            // Ingresando la nueva variable y sacando la antigua de la base
+            val_Xb[fila_pivote] = C_x[columna_pivote];
+            if (val_Xb[fila_pivote].charAt(0) == "R" ) {
+                val_Cx[fila_pivote] = -1;
+            }else{
+                val_Cx[fila_pivote] = 0;
+            }
+            
+            console.log("nuevo valor de XB en pos de -fila piv: " +val_Xb[fila_pivote]);
+
+            for (let i = 0; i < n_restricciones; i++) {
+                document.getElementById("tbody_mat"+(auxiliar+1)).innerHTML += '<tr id="tbody_m_'+(i+1)+'_'+(auxiliar+1)+'">';
+                document.getElementById('tbody_m_'+(i+1)+'_'+(auxiliar+1)).innerHTML +='<th>'+val_Cx[i]+'</th>'; 
+                document.getElementById("tbody_mat"+(auxiliar+1)).innerHTML +='</tr>'; 
+            }
+
+            for (let i = 0; i < n_restricciones; i++) {
+                document.getElementById("tbody_mat"+(auxiliar+1)).innerHTML += '<tr id="tbody_m_'+(i+1)+'_'+(auxiliar+1)+'">';
+                document.getElementById('tbody_m_'+(i+1)+'_'+(auxiliar+1)).innerHTML +='<th class="table-active">'+val_Xb[i]+'</th>'; 
+                document.getElementById("tbody_mat"+(auxiliar+1)).innerHTML +='</tr>'; 
+            }
+
+            // Elemento pivote ----- matriz_final[fila_pivote][columna_pivote];
+            // C_x[fila_pivote-1];
+            // columm ++7
+            // fila con 3 restricciones --------------------------------
 
             
-            console.log("Matriz auxiliar");
+            console.log("Matriz auxiliar-------------------");
             console.log(matriz_final_auxiliar);
             console.log("Matriz Final");
             console.log(matriz_final);
 
             // Cerrando cada tabla generada para la segunda fase
             auxiliar++;
-            document.getElementById("primera_fase").innerHTML += '</table>';
             
             // verificación para la terminación de la primera fase en minimización
             for (let i = 0; i < val_Z.length; i++) {
                 if (val_Z[i] >= 0) {
                     validacion_max = true;
-                }else if (val_Z[i] <= 0) {
+                }else if (val_Z[i] < 0) {
                     validacion_max = false;
                 }                    
             }
@@ -541,7 +566,7 @@ function Generar_simplex(){
             for (let i = 0; i < val_Z.length; i++) {                
                 if (val_Z[i] >= 0) {
                     validacion_min = true;
-                }else if (val_Z[i] <= 0) {
+                }else if (val_Z[i] < 0) {
                     validacion_min = false;
                 }
             }
