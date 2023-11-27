@@ -328,6 +328,8 @@ function Generar_simplex(){
         }
         document.getElementById("tbody_matriz").innerHTML +='</tr>';  
     }
+    // console.log(matriz_final);
+
     // INSERTANDO LOS BI
     for (let i = 0; i < n_restricciones; i++) {
         document.getElementById("tbody_matriz").innerHTML += '<tr id="tbody_matriz_'+(i+1)+'">';
@@ -457,9 +459,14 @@ function Generar_simplex(){
 
 
     let val_Xb_auxiliar = val_Xb;
-    let matriz_final_auxiliar = matriz_final;
     let B_i_auxiliar = B_i;
     let val_Z_auxiliar = val_Z;
+
+    auxiliar = n_variables+variable_aux;
+    let matriz_final_auxiliar = new Array(n_restricciones-1);
+    for (let i = 0; i < n_restricciones; i++) {
+        matriz_final_auxiliar[i] = new Array(auxiliar);
+    }
 
     document.getElementById("primera_fase").innerHTML = '';
     
@@ -467,7 +474,11 @@ function Generar_simplex(){
         auxiliar = 0;
         // while (validacion_max == false) {
             
-        while (auxiliar < 2) {
+        while (auxiliar < 1) {
+            
+            console.log("Matriz final-------------------");
+            console.log(matriz_final);
+
             // ENCABEZADO DE LAS TABLAS DE SEGUNDA FASE
             // Titulo tabla
             document.getElementById("primera_fase").innerHTML += '<center> <br> <h5>Iteración Num. '+(auxiliar+1)+'</h5> <br> </center>';
@@ -495,7 +506,6 @@ function Generar_simplex(){
                 }        
             } 
             document.getElementById("thead_encab"+(auxiliar+1)).innerHTML +='</tr>';
-
             // Agregando encabezado 2
             document.getElementById("thead_encab"+(auxiliar+1)).innerHTML +='<tr id="encab_0'+(auxiliar+1)+'" class="table-active">';
             for (let i = 0; i < largo_tabla; i++) {
@@ -526,12 +536,83 @@ function Generar_simplex(){
                 document.getElementById('tbody_m_'+(i+1)+'_'+(auxiliar+1)).innerHTML +='<th>'+val_Cx[i]+'</th>'; 
                 document.getElementById("tbody_mat"+(auxiliar+1)).innerHTML +='</tr>'; 
             }
-
             for (let i = 0; i < n_restricciones; i++) {
                 document.getElementById("tbody_mat"+(auxiliar+1)).innerHTML += '<tr id="tbody_m_'+(i+1)+'_'+(auxiliar+1)+'">';
                 document.getElementById('tbody_m_'+(i+1)+'_'+(auxiliar+1)).innerHTML +='<th class="table-active">'+val_Xb[i]+'</th>'; 
                 document.getElementById("tbody_mat"+(auxiliar+1)).innerHTML +='</tr>'; 
             }
+
+            // INSERTANDO LA MATRIZ_FINAL
+            tam_matriz = n_variables+variable_aux;
+            
+            for (let i = 0; i < n_restricciones; i++) {
+                for (let y = 0; y < tam_matriz; y++) {
+                    if (i == fila_pivote) {
+                        if (matriz_final[i][y] == 0) {
+                            matriz_final_auxiliar [i][y] = 0; 
+                        }else if(matriz_final[i][y] != 0){ 
+                            matriz_final_auxiliar[i][y] = matriz_final[i][y] * (1 / matriz_final[fila_pivote][columna_pivote]);
+                        }
+                    }
+                }       
+            }
+            for (let i = 0; i < n_restricciones; i++) {
+                for (let y = 0; y < tam_matriz; y++) {
+                    if (i != fila_pivote) { 
+                        if (matriz_final[i][columna_pivote] == 0) {
+                            matriz_final_auxiliar[i][y] = (matriz_final_auxiliar[fila_pivote][y] * matriz_final[i][columna_pivote])+ matriz_final[i][y];
+                        }else {
+                            matriz_final_auxiliar[i][y] = (matriz_final_auxiliar[fila_pivote][y] * -matriz_final[i][columna_pivote])+ matriz_final[i][y];
+                        }
+                    }
+                }    
+            }
+
+            for (let i = 0; i < n_restricciones; i++) {
+                document.getElementById("tbody_mat"+(auxiliar+1)).innerHTML += '<tr id="tbody_m_'+(i+1)+'_'+(auxiliar+1)+'">';
+                for (let y = 0; y < tam_matriz; y++) {
+                    // para mostrarlo como fracciones
+                    // let frac = new Fraction(matriz_final_auxiliar[i][y]);
+                    document.getElementById('tbody_m_'+(i+1)+'_'+(auxiliar+1)).innerHTML +='<th>'+matriz_final_auxiliar[i][y].toFixed(2)+'</th>';            
+                }
+                document.getElementById("tbody_mat"+(auxiliar+1)).innerHTML +='</tr>';  
+            }
+
+
+            // INSERTANDO LOS BI
+            for (let i = 0; i < n_restricciones; i++) {
+                if (i == fila_pivote) {
+                    if (B_i[i]== 0) {
+                        B_i_auxiliar [i]= 0; 
+                    }else if(B_i[i] != 0){ 
+                        console.log("piv_fil: "+B_i[i]+" *( 1/"+matriz_final[fila_pivote][columna_pivote]+") = "+(B_i[i] * (1 / matriz_final[fila_pivote][columna_pivote])) );
+                        B_i_auxiliar[i] = B_i[i] * (1 / matriz_final[fila_pivote][columna_pivote]);
+                    }
+                }
+            }
+            for (let i = 0; i < n_restricciones; i++) {
+                if (i != fila_pivote) { 
+                    if (B_i[i] == 0) {
+                        console.log("aux: ("+B_i_auxiliar[fila_pivote]+" * "+B_i[i]+") +"+B_i[i]);
+                        B_i_auxiliar[i] = (B_i_auxiliar[fila_pivote] * B_i[i]) + B_i[i];
+                    }else {
+                        console.log("aux: ("+B_i_auxiliar[fila_pivote]+" * -"+B_i[i]+") +"+B_i[i]);
+                        B_i_auxiliar[i] = (B_i_auxiliar[fila_pivote] * -(B_i[i]) ) + B_i[i];
+                    }
+                }
+                 
+            }
+
+            console.log(B_i_auxiliar);
+
+
+
+            for (let i = 0; i < n_restricciones; i++) {
+                document.getElementById("tbody_mat"+(auxiliar+1)).innerHTML += '<tr id="tbody_m_'+(i+1)+'_'+(auxiliar+1)+'">';
+                document.getElementById('tbody_m_'+(i+1)+'_'+(auxiliar+1)).innerHTML +='<th>'+B_i_auxiliar[i]+'</th>';
+                document.getElementById("tbody_mat"+(auxiliar+1)).innerHTML +='</tr>'; 
+            }
+
 
             // Elemento pivote ----- matriz_final[fila_pivote][columna_pivote];
             // C_x[fila_pivote-1];
@@ -539,10 +620,10 @@ function Generar_simplex(){
             // fila con 3 restricciones --------------------------------
 
             
-            console.log("Matriz auxiliar-------------------");
-            console.log(matriz_final_auxiliar);
-            console.log("Matriz Final");
-            console.log(matriz_final);
+            // console.log("Matriz auxiliar-------------------");
+            // console.log(matriz_final_auxiliar);
+            // console.log("Matriz Final");
+            // console.log(matriz_final);
 
             // Cerrando cada tabla generada para la segunda fase
             auxiliar++;
