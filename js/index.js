@@ -88,9 +88,9 @@ function Method_1() {
 
 function Generar_simplex(){
 
-    document.getElementById("col_pivote_inicial").innerHTML = '';
-    document.getElementById("fil_pivote_inicial").innerHTML = '';
-    document.getElementById("elem_pivote_inicial").innerHTML = '';
+    // document.getElementById("col_pivote_inicial").innerHTML = '';
+    // document.getElementById("fil_pivote_inicial").innerHTML = '';
+    // document.getElementById("elem_pivote_inicial").innerHTML = '';
     document.getElementById("modelo_textual").style = "display: block";
 
     // #filas
@@ -109,27 +109,6 @@ function Generar_simplex(){
     document.getElementById("tbody_matriz").innerHTML = '';
     document.getElementById("tfoot_end").innerHTML = '';
     
-    //Agregando modelo textual de las variables artificiales que se trabajarán
-    for (let i = 0; i < n_restricciones; i++) {
-        let combo_1 = document.getElementById("variables_adicionales"+(i+1));
-        let rest_1 = combo_1.options[combo_1.selectedIndex].value;
-
-        if (rest_1 == "mayor_igual") {
-            variable_s++;
-            variable_r++;
-            document.getElementById("modelo_textual_1").innerHTML +='<li style="font-size: 1.2rem; color: aliceblue;"><span>'+'&nbsp&nbsp&nbsp '+(i+1)+'. Tiene signo "≥" (mayor igual) por lo que se restará la variable de exceso S'+variable_s+' y se sumará la variable artificial R'+variable_r+'.</span></li>';
-    
-        } else if (rest_1 == "menor_igual") {
-            variable_h++;
-            document.getElementById("modelo_textual_1").innerHTML +='<li style="font-size: 1.2rem; color: aliceblue;"><span>'+'&nbsp&nbsp&nbsp '+(i+1)+'. Tiene signo "≤" (menor igual) por lo que se agregará la variable de holgura H'+(variable_h)+'.</span></li>';
-            
-        } else if (rest_1 == "igual") {
-            variable_r++;
-            document.getElementById("modelo_textual_1").innerHTML +='<li style="font-size: 1.2rem; color: aliceblue;"><span>'+'&nbsp&nbsp&nbsp '+(i+1)+'. Tiene signo "=" (igual) por lo que se agregará la variable artificial R'+variable_r+'.</span></li>';
-            
-        }
-    }
-
     //Creando matriz_inicial dinámica para capturar el modelo
     let matriz_inicial = new Array(n_restricciones-1);
     for (let i = 0; i < n_restricciones; i++) {
@@ -140,8 +119,70 @@ function Generar_simplex(){
         for (let y = 0; y <n_variables; y++) {
             matriz_inicial [i][y] = parseFloat(document.getElementById("num_X"+(y+1)+"_Y"+(i+1)+"").value);
         }   
-        matriz_inicial[i][n_variables] = parseFloat(document.getElementById("num_X"+(i+1)+"").value);     
+        // matriz_inicial[i][n_variables] = parseFloat(document.getElementById("num_X"+(i+1)+"").value);     
     }
+
+    // Extrayendo los valores de Bi
+    let B_i = new Array(n_restricciones);
+    for (let i = 0; i < n_restricciones; i++) {
+        B_i[i] = parseFloat(document.getElementById("num_X"+(i+1)+"").value);   
+    }
+
+    for (let i = 0; i < B_i.length; i++) {
+        let combo_1 = document.getElementById("variables_adicionales"+(i+1));
+        let rest_1 = combo_1.options[combo_1.selectedIndex].value;
+        
+        if (B_i[i] < 0) {
+            for (let y = 0; y < n_variables; y++) { 
+                auxiliar = matriz_inicial [i][y] * -1;
+                matriz_inicial [i][y] = parseFloat(auxiliar);  
+            }
+            if (rest_1 == "mayor_igual") {
+                combo_1.value= "menor_igual";
+    
+            } else if (rest_1 == "menor_igual") {
+                combo_1.value= "mayor_igual";
+    
+            } else if (rest_1 == "igual") {
+                combo_1.value= "mayor_igual";
+            }
+        }   
+    }
+    // Si es negativo lo "multiplica por -1"
+    for (let i = 0; i < B_i.length; i++) {
+        if (B_i[i] < 0) {
+            B_i[i] = Math.abs(B_i[i]);   
+        }
+    }
+
+
+    //Agregando modelo textual de las variables artificiales que se trabajarán
+    for (let i = 0; i < n_restricciones; i++) {
+        let combo_1 = document.getElementById("variables_adicionales"+(i+1));
+        let rest_1 = combo_1.options[combo_1.selectedIndex].value;
+
+        if (rest_1 == "mayor_igual") {
+            variable_s++;
+            variable_r++;
+            document.getElementById("modelo_textual_1").innerHTML +='<li id="artificial_'+(i+1)+'" style="font-size: 1.2rem; color: aliceblue;"><span>'+'&nbsp&nbsp&nbsp '+(i+1)+'. Tiene signo "≥" (mayor igual) por lo que se restará la variable de exceso S'+variable_s+' y se sumará la variable artificial R'+variable_r+'. </span></li>';
+    
+        } else if (rest_1 == "menor_igual") {
+            variable_h++;
+            document.getElementById("modelo_textual_1").innerHTML +='<li id="artificial_'+(i+1)+'" style="font-size: 1.2rem; color: aliceblue;"><span>'+'&nbsp&nbsp&nbsp '+(i+1)+'. Tiene signo "≤" (menor igual) por lo que se agregará la variable de holgura H'+(variable_h)+'. </span></li>';
+            
+        } else if (rest_1 == "igual") {
+            variable_r++;
+            document.getElementById("modelo_textual_1").innerHTML +='<li id="artificial_'+(i+1)+'" style="font-size: 1.2rem; color: aliceblue;"><span>'+'&nbsp&nbsp&nbsp '+(i+1)+'. Tiene signo "=" (igual) por lo que se agregará la variable artificial R'+variable_r+'. </span></li>';
+            
+        }
+    }
+
+    for (let i = 0; i < n_restricciones; i++) {
+        if (B_i[i] < 0) {
+            // se multiplica por -1
+            document.getElementById("artificial_"+(i+1)).innerHTML += 'El término independiente era negativo y se multiplicó por -1 a todos los coeficientes de la restricción [cambia de singo: ( ≤ ) a  ( ≥ ) o viceversa, si es ( = ) se mantiente]';
+        }   
+    }    
 
     // Contando el número de variables artificiales, de Superavit y Holgura que se agregarán
     let variable_aux = variable_r+ variable_s+variable_h;
@@ -210,7 +251,6 @@ function Generar_simplex(){
             C_x.push("R"+variable_r);  
         }
     }
-
     
     //Agregando los nombres de las variables
     for (let i = n_variables-1; i >= 0; i--) {
@@ -269,11 +309,6 @@ function Generar_simplex(){
             matriz_final [i][y] = matriz_aux [i][y-n_variables];
         }
     }
-    // Extrayendo los valores de Bi
-    let B_i = new Array(n_variables);
-    for (let i = 0; i < n_restricciones; i++) {
-        B_i[i] = parseFloat(document.getElementById("num_X"+(i+1)+"").value);        
-    }
 
     // ENCABEZADO DE LA MATRIZ_FINAL 
     let largo_tabla = C_x.length+2;
@@ -328,7 +363,6 @@ function Generar_simplex(){
         }
         document.getElementById("tbody_matriz").innerHTML +='</tr>';  
     }
-    // console.log(matriz_final);
 
     // INSERTANDO LOS BI
     for (let i = 0; i < n_restricciones; i++) {
@@ -421,10 +455,6 @@ function Generar_simplex(){
                 fila_pivote = i;
             }
         }
-        document.getElementById("col_pivote_inicial").innerHTML = C_x[fila_pivote];
-        document.getElementById("fil_pivote_inicial").innerHTML = val_Xb[fila_pivote];
-        document.getElementById("elem_pivote_inicial").innerHTML = matriz_final[fila_pivote][columna_pivote];
-
     }else if (objetivo == "Minimizar"){
         let auxi = 0;
         for (let i = 0; i < tam_mat; i++) {
@@ -448,9 +478,6 @@ function Generar_simplex(){
                 fila_pivote = i;
             }
         }
-        document.getElementById("col_pivote_inicial").innerHTML = C_x[fila_pivote-1];
-        document.getElementById("fil_pivote_inicial").innerHTML = val_Xb[fila_pivote];
-        document.getElementById("elem_pivote_inicial").innerHTML = matriz_final[fila_pivote][columna_pivote];
     }
 
     // Variables auxiliares para el problema
@@ -466,18 +493,50 @@ function Generar_simplex(){
     document.getElementById("primera_fase").innerHTML = '';
     
     // PROGRAMANDO LA PRIMERA FASE
-    let validacion_max = 0;
-    let validacion_min = 0;
+    let validacion_max = 1;
+    let validacion_min = 1;
 
-    if ( objetivo == "Maximizar"){
+    // if ( objetivo == "Maximizar"){
+        
+        // verificación para la terminación de la primera fase en minimización       
+        auxiliar = 0;     
+        if ( objetivo == "Maximizar"){
+            if (val_Z[val_Z.length-1] >= 0 ) {
+                validacion_max = 1;
+                document.getElementById("primera_fase").innerHTML += '<p style="font-size: 1.2rem; color: aliceblue;">Se finalizaron las iteraciones de la primera fase y existe alguna solución posible para el problema. </p> <br>'
+            }else if (val_Z[val_Z.length-1] < 0) {
+                validacion_max = 0;
+                if (auxiliar == 0) {
+                    document.getElementById("primera_fase").innerHTML += '<p style="font-size: 1.2rem; color: aliceblue;">Ingresa la variable '+C_x[fila_pivote-1]+' y sale de la base la variable '+val_Xb[fila_pivote]+'. El elemento pivote es '+matriz_final[fila_pivote][columna_pivote]+'. </p> <br>'
+                }else{
+                    document.getElementById("primera_fase").innerHTML += '<p style="font-size: 1.2rem; color: aliceblue;">Ingresa la variable '+C_x[fila_pivote]+' y sale de la base la variable '+val_Xb[fila_pivote]+'. El elemento pivote es '+matriz_final[fila_pivote][columna_pivote]+'. </p> <br>'
+                }
+            } 
+            auxiliar++; 
+        }if ( objetivo == "Minimizar"){
+            if (val_Z[val_Z.length-1] <= 0 ) {
+                validacion_min = 1;
+                document.getElementById("primera_fase").innerHTML += '<p style="font-size: 1.2rem; color: aliceblue;">Se finalizaron las iteraciones de la primera fase y existe alguna solución posible para el problema. </p> <br>'
+            }else if (val_Z[val_Z.length-1] > 0) {
+                validacion_min = 0;
+                if (auxiliar == 0) {
+                    document.getElementById("primera_fase").innerHTML += '<p style="font-size: 1.2rem; color: aliceblue;">Ingresa la variable '+C_x[fila_pivote-1]+' y sale de la base la variable '+val_Xb[fila_pivote]+'. El elemento pivote es '+matriz_final[fila_pivote][columna_pivote]+'. </p> <br>'
+                }else{
+                    document.getElementById("primera_fase").innerHTML += '<p style="font-size: 1.2rem; color: aliceblue;">Ingresa la variable '+C_x[fila_pivote]+' y sale de la base la variable '+val_Xb[fila_pivote]+'. El elemento pivote es '+matriz_final[fila_pivote][columna_pivote]+'. </p> <br>'
+                }
+            }  
+            auxiliar++
+        }
+        console.log("Valores de Cx fuera de ciclo");
+        console.log(C_x);
+        
+
         auxiliar = 0;
-        
-        
+        while (validacion_max == 0 || validacion_min == 0) {
 
-        while (validacion_max == 0) {
-            console.log("Valores de Z antes");
+            console.log("Valores de Z antes (fase 1)");
             console.log(val_Z);
-
+            
             // Titulo tabla
             document.getElementById("primera_fase").innerHTML += '<center> <br> <h5>Iteración Num. '+(auxiliar+1)+'</h5> <br> </center>';
             
@@ -498,7 +557,11 @@ function Generar_simplex(){
                     document.getElementById("encab_"+(auxiliar+1)).innerHTML +='<th class="table-active">Cj</th>';
                 }else if (C_x[i-2].charAt(0) == "R" ) {
                     // Maximizar (-1) y Minimizar (+1)
-                    document.getElementById("encab_"+(auxiliar+1)).innerHTML +='<th>-1</th>';
+                    if ( objetivo == "Maximizar"){
+                        document.getElementById("encab_"+(auxiliar+1)).innerHTML +='<th>-1</th>';
+                    }if ( objetivo == "Minimizar"){
+                        document.getElementById("encab_"+(auxiliar+1)).innerHTML +='<th>1</th>';
+                    }                    
                 } else{
                     document.getElementById("encab_"+(auxiliar+1)).innerHTML +='<th>0</th>';
                 }        
@@ -520,8 +583,12 @@ function Generar_simplex(){
 
             // BODY - Ingresando la nueva variable y sacando la antigua de la base
             val_Xb[fila_pivote] = C_x[columna_pivote];
-            if (val_Xb[fila_pivote].charAt(0) == "R" ) {
-                val_Cx[fila_pivote] = -1;
+            if (val_Xb[fila_pivote].charAt(0) == "R" ) { 
+                if ( objetivo == "Maximizar"){
+                    val_Cx[fila_pivote] = -1;
+                }if ( objetivo == "Minimizar"){
+                    val_Cx[fila_pivote] = 1;
+                }                
             }else{
                 val_Cx[fila_pivote] = 0;
             }
@@ -557,7 +624,13 @@ function Generar_simplex(){
                         if (matriz_final[i][columna_pivote] == 0) {
                             matriz_final_auxiliar[i][y] = (matriz_final_auxiliar[fila_pivote][y] * matriz_final[i][columna_pivote])+ matriz_final[i][y];
                         }else {
-                            matriz_final_auxiliar[i][y] = (matriz_final_auxiliar[fila_pivote][y] * -matriz_final[i][columna_pivote])+ matriz_final[i][y];
+                            
+                            if ( objetivo == "Maximizar"){
+                                matriz_final_auxiliar[i][y] = (matriz_final_auxiliar[fila_pivote][y] * -matriz_final[i][columna_pivote])+ matriz_final[i][y];
+                            }if ( objetivo == "Minimizar"){
+                                matriz_final_auxiliar[i][y] = (matriz_final_auxiliar[fila_pivote][y] * matriz_final[i][columna_pivote])+ matriz_final[i][y];
+                            }
+                            
                         }
                     }
                 }    
@@ -591,10 +664,19 @@ function Generar_simplex(){
                     if (matriz_final[i][columna_pivote] == 0) {
                         B_i_auxiliar[i] = B_i[i];
                     }else {
+                        
+                    if ( objetivo == "Maximizar"){
                         B_i_auxiliar[i] = parseFloat((B_i_auxiliar[fila_pivote] * -matriz_final[i][columna_pivote]) + B_i[i]) ;
+                    }if ( objetivo == "Minimizar"){
+                        B_i_auxiliar[i] = parseFloat((B_i_auxiliar[fila_pivote] * matriz_final[i][columna_pivote]) + B_i[i]) ;
+                    }
+                        
                     }
                 }
             }
+            console.log("Valores de B_i en primera fase");
+            console.log(B_i);
+            
 
             // Insertando los B_i a la tabla
             for (let i = 0; i < n_restricciones; i++) {
@@ -644,9 +726,8 @@ function Generar_simplex(){
                     
                 } 
             }
-            console.log("Valores de Z después");
-            console.log(val_Z);
 
+            // Los valores actuales pasan a ser los valores actiales de la MATRIZ_FINAL
             auxi =  n_variables+variable_aux;;
             for (let i = 0; i < n_restricciones; i++) {
                 B_i[i] = B_i_auxiliar[i];
@@ -654,63 +735,87 @@ function Generar_simplex(){
                     matriz_final[i][y] = matriz_final_auxiliar[i][y];
                 }                
             }
-
             // let tam_mat = tam_matriz -1;
             // Determinando el nuevo elemento pivote
-            auxi = 0;
-            for (let i = 0; i < tam_mat; i++) {
-                if (val_Z[i] < auxi) {
-                    auxi = val_Z[i];
-                    columna_pivote = i;
+            if ( objetivo == "Maximizar"){
+                let auxi = 0;
+                for (let i = 0; i < tam_mat; i++) {
+                    if (val_Z[i] < auxi) {
+                        auxi = val_Z[i];
+                        columna_pivote = i;
+                    }
+                }
+                let auxiliar_columna_pivote = new Array();
+                for (let i = 0; i < n_restricciones; i++) {
+                    if (matriz_final[i][columna_pivote] == 0) {
+                        auxiliar_columna_pivote [i] = 0;  
+                    }else {
+                        auxiliar_columna_pivote [i] = B_i[i] / matriz_final[i][columna_pivote]; 
+                    }
+                }
+                auxi = 1;
+                for (let i = 0; i < n_restricciones; i++) {
+                    if (auxiliar_columna_pivote[i] <= auxi && auxiliar_columna_pivote[i] != 0) {
+                        auxi = auxiliar_columna_pivote[i];
+                        fila_pivote = i;
+                    }
+                }
+        
+            }else if (objetivo == "Minimizar"){
+                let auxi = 0;
+                for (let i = 0; i < tam_mat; i++) {
+                    if (val_Z[i] > auxi) {
+                        auxi = val_Z[i];
+                        columna_pivote = i;
+                    }
+                }
+                let auxiliar_columna_pivote = new Array();
+                for (let i = 0; i < n_restricciones; i++) {
+                    if (matriz_final[i][columna_pivote] == 0) {
+                        auxiliar_columna_pivote [i] = 0;  
+                    }else {
+                        auxiliar_columna_pivote [i] = B_i[i] / matriz_final[i][columna_pivote]; 
+                    }
+                }
+                auxi = 1;
+                for (let i = 0; i < n_restricciones; i++) {
+                    if (auxiliar_columna_pivote[i] <= auxi && auxiliar_columna_pivote[i] != 0) {
+                        auxi = auxiliar_columna_pivote[i];
+                        fila_pivote = i;
+                    }
                 }
             }
-            let auxiliar_columna_pivote = new Array();
-            for (let i = 0; i < n_restricciones; i++) {
-                if (matriz_final[i][columna_pivote] == 0) {
-                    auxiliar_columna_pivote [i] = 0;  
-                }else {
-                    auxiliar_columna_pivote [i] = B_i[i] / matriz_final[i][columna_pivote]; 
-                }
-            }
-            auxi = 1;
-            for (let i = 0; i < n_restricciones; i++) {
-                if (auxiliar_columna_pivote[i] <= auxi && auxiliar_columna_pivote[i] != 0) {
-                    auxi = auxiliar_columna_pivote[i];
-                    fila_pivote = i;
-                }
-            }
-
-            document.getElementById("primera_fase").innerHTML += '<p style="font-size: 1.2rem; color: aliceblue;">Ingresa la variable '+C_x[fila_pivote]+' y sale de la base la variable '+val_Xb[fila_pivote]+'. El elemento pivote es '+matriz_final[fila_pivote][columna_pivote]+'. </p> <br>'
 
             // Aumentando el número de iteraciones de la fase
             auxiliar++;
 
-            // verificación para la terminación de la primera fase en minimización
-            // for (let i = 0; i < val_Z.length; i++) {
+            // verificación para la terminación de la primera fase en minimización            
+            if ( objetivo == "Maximizar"){
                 if (val_Z[val_Z.length-1] >= 0) {
                     validacion_max = 1;
+                    document.getElementById("primera_fase").innerHTML += '<p style="font-size: 1.2rem; color: aliceblue;">Se finalizaron las iteraciones de la primera fase y existe alguna solución posible para el problema. </p> <br>'
                 }else if (val_Z[val_Z.length-1] < 0) {
                     validacion_max = 0;
-                }                    
+                    document.getElementById("primera_fase").innerHTML += '<p style="font-size: 1.2rem; color: aliceblue;">Ingresa la variable '+C_x[fila_pivote]+' y sale de la base la variable '+val_Xb[fila_pivote]+'. El elemento pivote es '+matriz_final[fila_pivote][columna_pivote]+'. </p> <br>'
+                }  
+            }if ( objetivo == "Minimizar"){
+                if (val_Z[val_Z.length-1] <= 0) {
+                    validacion_min = 1;
+                    document.getElementById("primera_fase").innerHTML += '<p style="font-size: 1.2rem; color: aliceblue;">Se finalizaron las iteraciones de la primera fase y existe alguna solución posible para el problema. </p> <br>'
+                }else if (val_Z[val_Z.length-1] > 0) {
+                    validacion_min = 0;
+                    document.getElementById("primera_fase").innerHTML += '<p style="font-size: 1.2rem; color: aliceblue;">Ingresa la variable '+C_x[fila_pivote]+' y sale de la base la variable '+val_Xb[fila_pivote]+'. El elemento pivote es '+matriz_final[fila_pivote][columna_pivote]+'. </p> <br>'
+                }  
+            }
+                                  
             // }
-            console.log("Validación (1 para - 0 sigue): "+validacion_max+"con z="+val_Z[val_Z.length-1]);
+            
+            console.log("Valores de Z después (fase 1)");
+            console.log(val_Z);
+            console.log("Validación (1:stop  - 0:sigue): "+validacion_max+" -> con z="+val_Z[val_Z.length-1]);
         }
         
-    }else if (objetivo == "Minimizar") {
-        while (validacion_min == false) {
-          
-            
-            
-            // verificación para la terminación de la primera fase en minimización
-            for (let i = 0; i < val_Z.length; i++) {                
-                if (val_Z[i] >= 0) {
-                    validacion_min = true;
-                }else if (val_Z[i] < 0) {
-                    validacion_min = false;
-                }
-            }
-        }
-    }
+    
     
     
     
