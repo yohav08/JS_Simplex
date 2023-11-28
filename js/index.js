@@ -496,324 +496,324 @@ function Generar_simplex(){
     let validacion_max = 1;
     let validacion_min = 1;
 
-    // if ( objetivo == "Maximizar"){
+    
         
-        // verificación para la terminación de la primera fase en minimización       
-        auxiliar = 0;     
+    // verificación para la terminación de la primera fase en minimización       
+    auxiliar = 0;     
+    if ( objetivo == "Maximizar"){
+        if (val_Z[val_Z.length-1] >= 0 ) {
+            validacion_max = 1;
+            document.getElementById("primera_fase").innerHTML += '<p style="font-size: 1.2rem; color: aliceblue;">Se finalizaron las iteraciones de la primera fase y existe alguna solución posible para el problema. </p> <br>'
+        }else if (val_Z[val_Z.length-1] < 0) {
+            validacion_max = 0;
+            if (auxiliar == 0) {
+                document.getElementById("primera_fase").innerHTML += '<p style="font-size: 1.2rem; color: aliceblue;">Ingresa la variable '+C_x[fila_pivote-1]+' y sale de la base la variable '+val_Xb[fila_pivote]+'. El elemento pivote es '+matriz_final[fila_pivote][columna_pivote]+'. </p> <br>'
+            }else{
+                document.getElementById("primera_fase").innerHTML += '<p style="font-size: 1.2rem; color: aliceblue;">Ingresa la variable '+C_x[fila_pivote]+' y sale de la base la variable '+val_Xb[fila_pivote]+'. El elemento pivote es '+matriz_final[fila_pivote][columna_pivote]+'. </p> <br>'
+            }
+        } 
+        auxiliar++; 
+    }if ( objetivo == "Minimizar"){
+        if (val_Z[val_Z.length-1] <= 0 ) {
+            validacion_min = 1;
+            document.getElementById("primera_fase").innerHTML += '<p style="font-size: 1.2rem; color: aliceblue;">Se finalizaron las iteraciones de la primera fase y existe alguna solución posible para el problema. </p> <br>'
+        }else if (val_Z[val_Z.length-1] > 0) {
+            validacion_min = 0;
+            if (auxiliar == 0) {
+                document.getElementById("primera_fase").innerHTML += '<p style="font-size: 1.2rem; color: aliceblue;">Ingresa la variable '+C_x[fila_pivote-1]+' y sale de la base la variable '+val_Xb[fila_pivote]+'. El elemento pivote es '+matriz_final[fila_pivote][columna_pivote]+'. </p> <br>'
+            }else{
+                document.getElementById("primera_fase").innerHTML += '<p style="font-size: 1.2rem; color: aliceblue;">Ingresa la variable '+C_x[fila_pivote]+' y sale de la base la variable '+val_Xb[fila_pivote]+'. El elemento pivote es '+matriz_final[fila_pivote][columna_pivote]+'. </p> <br>'
+            }
+        }  
+        auxiliar++
+    }
+    console.log("Valores de Cx fuera de ciclo");
+    console.log(C_x);
+    
+
+    auxiliar = 0;
+    while (validacion_max == 0 || validacion_min == 0) {
+
+        console.log("Valores de Z antes (fase 1)");
+        console.log(val_Z);
+        
+        // Titulo tabla
+        document.getElementById("primera_fase").innerHTML += '<center> <br> <h5>Iteración Num. '+(auxiliar+1)+'</h5> <br> </center>';
+        
+        // tabla numerada por cada iteración de 
+        document.getElementById("primera_fase").innerHTML += '<table id="tabla_'+(auxiliar+1)+'" class="table table-light" style="table-layout: fixed !important; border-radius: 8px !important; text-align: center !important; width: auto !important; " >';
+        document.getElementById("tabla_"+(auxiliar+1)).innerHTML += '<thead id="thead_encab'+(auxiliar+1)+'"> </thead>';
+        document.getElementById("tabla_"+(auxiliar+1)).innerHTML += '<tbody id="tbody_mat'+(auxiliar+1)+'"></tbody>';
+        document.getElementById("tabla_"+(auxiliar+1)).innerHTML += '<tfoot id="tfoot_fin'+(auxiliar+1)+'"> </tfoot>';
+        document.getElementById("primera_fase").innerHTML += '</table>';
+
+        // largo_tabla = C_x.length+2;
+        // Agregando encabezado 1 para cada tabla
+        document.getElementById("thead_encab"+(auxiliar+1)).innerHTML += '<tr id="encab_'+(auxiliar+1)+'">';
+        for (let i = 0; i < largo_tabla; i++) {
+            if (i==0) {
+                document.getElementById("encab_"+(auxiliar+1)).innerHTML +='<th class="table-active"></th>';
+            }else if (i==1) {
+                document.getElementById("encab_"+(auxiliar+1)).innerHTML +='<th class="table-active">Cj</th>';
+            }else if (C_x[i-2].charAt(0) == "R" ) {
+                // Maximizar (-1) y Minimizar (+1)
+                if ( objetivo == "Maximizar"){
+                    document.getElementById("encab_"+(auxiliar+1)).innerHTML +='<th>-1</th>';
+                }if ( objetivo == "Minimizar"){
+                    document.getElementById("encab_"+(auxiliar+1)).innerHTML +='<th>1</th>';
+                }                    
+            } else{
+                document.getElementById("encab_"+(auxiliar+1)).innerHTML +='<th>0</th>';
+            }        
+        } 
+        document.getElementById("thead_encab"+(auxiliar+1)).innerHTML +='</tr>';
+        
+        // Agregando encabezado 2
+        document.getElementById("thead_encab"+(auxiliar+1)).innerHTML +='<tr id="encab_0'+(auxiliar+1)+'" class="table-active">';
+        for (let i = 0; i < largo_tabla; i++) {
+            if (i==0) {
+                document.getElementById("encab_0"+(auxiliar+1)).innerHTML +='<th class="table-active">Cx</th>';
+            }else if (i==1) {
+                document.getElementById("encab_0"+(auxiliar+1)).innerHTML +='<th class="table-active">Xb</th>';
+            }else{
+                document.getElementById("encab_0"+(auxiliar+1)).innerHTML +='<th>'+C_x[i-2]+'</th>';
+            }
+        } 
+        document.getElementById("thead_encab"+(auxiliar+1)).innerHTML +='</tr>';
+
+        // BODY - Ingresando la nueva variable y sacando la antigua de la base
+        val_Xb[fila_pivote] = C_x[columna_pivote];
+        if (val_Xb[fila_pivote].charAt(0) == "R" ) { 
+            if ( objetivo == "Maximizar"){
+                val_Cx[fila_pivote] = -1;
+            }if ( objetivo == "Minimizar"){
+                val_Cx[fila_pivote] = 1;
+            }                
+        }else{
+            val_Cx[fila_pivote] = 0;
+        }
+        
+        // Ingresando columna C_X y columna de Xb
+        for (let i = 0; i < n_restricciones; i++) {
+            document.getElementById("tbody_mat"+(auxiliar+1)).innerHTML += '<tr id="tbody_m_'+(i+1)+'_'+(auxiliar+1)+'">';
+            document.getElementById('tbody_m_'+(i+1)+'_'+(auxiliar+1)).innerHTML +='<th>'+val_Cx[i]+'</th>'; 
+            document.getElementById("tbody_mat"+(auxiliar+1)).innerHTML +='</tr>'; 
+        }
+        for (let i = 0; i < n_restricciones; i++) {
+            document.getElementById("tbody_mat"+(auxiliar+1)).innerHTML += '<tr id="tbody_m_'+(i+1)+'_'+(auxiliar+1)+'">';
+            document.getElementById('tbody_m_'+(i+1)+'_'+(auxiliar+1)).innerHTML +='<th class="table-active">'+val_Xb[i]+'</th>'; 
+            document.getElementById("tbody_mat"+(auxiliar+1)).innerHTML +='</tr>'; 
+        }
+
+        // INSERTANDO LA MATRIZ_FINAL
+        tam_matriz = n_variables+variable_aux;
+        for (let i = 0; i < n_restricciones; i++) {
+            for (let y = 0; y < tam_matriz; y++) {
+                if (i == fila_pivote) {
+                    if (matriz_final[i][y] == 0) {
+                        matriz_final_auxiliar [i][y] = 0; 
+                    }else if(matriz_final[i][y] != 0){ 
+                        matriz_final_auxiliar[i][y] = matriz_final[i][y] * (1 / matriz_final[fila_pivote][columna_pivote]);
+                    }
+                }
+            }       
+        }
+        for (let i = 0; i < n_restricciones; i++) {
+            for (let y = 0; y < tam_matriz; y++) {
+                if (i != fila_pivote) { 
+                    if (matriz_final[i][columna_pivote] == 0) {
+                        matriz_final_auxiliar[i][y] = (matriz_final_auxiliar[fila_pivote][y] * matriz_final[i][columna_pivote])+ matriz_final[i][y];
+                    }else {
+                        
+                        if ( objetivo == "Maximizar"){
+                            matriz_final_auxiliar[i][y] = (matriz_final_auxiliar[fila_pivote][y] * -matriz_final[i][columna_pivote])+ matriz_final[i][y];
+                        }if ( objetivo == "Minimizar"){
+                            matriz_final_auxiliar[i][y] = (matriz_final_auxiliar[fila_pivote][y] * matriz_final[i][columna_pivote])+ matriz_final[i][y];
+                        }
+                        
+                    }
+                }
+            }    
+        }
+        // INSERTANDO LA MATRIZ_FINAL_AUXILIAR
+        for (let i = 0; i < n_restricciones; i++) {
+            document.getElementById("tbody_mat"+(auxiliar+1)).innerHTML += '<tr id="tbody_m_'+(i+1)+'_'+(auxiliar+1)+'">';
+            for (let y = 0; y < tam_matriz; y++) {
+                if (Number.isInteger(matriz_final_auxiliar[i][y])) {
+                    auxi = matriz_final_auxiliar[i][y];
+                    document.getElementById('tbody_m_'+(i+1)+'_'+(auxiliar+1)).innerHTML +='<th>'+auxi+'</th>';
+                }else{
+                    document.getElementById('tbody_m_'+(i+1)+'_'+(auxiliar+1)).innerHTML +='<th>'+matriz_final_auxiliar[i][y].toFixed(2)+'</th>';
+                }
+            }
+            document.getElementById("tbody_mat"+(auxiliar+1)).innerHTML +='</tr>';  
+        }
+
+        // INSERTANDO LOS BI - primero la fila piv y después las demás
+        for (let i = 0; i < n_restricciones; i++) {
+            if (i == fila_pivote) {
+                if (B_i[i]== 0) {
+                    B_i_auxiliar [i]= 0; 
+                }else if(B_i[i] != 0){ 
+                    B_i_auxiliar[i] = B_i[i] * (1 / matriz_final[fila_pivote][columna_pivote]);
+                }
+            }
+        }
+        for (let i = 0; i < n_restricciones; i++) {
+            if (i != fila_pivote) { 
+                if (matriz_final[i][columna_pivote] == 0) {
+                    B_i_auxiliar[i] = B_i[i];
+                }else {
+                    
+                if ( objetivo == "Maximizar"){
+                    B_i_auxiliar[i] = parseFloat((B_i_auxiliar[fila_pivote] * -matriz_final[i][columna_pivote]) + B_i[i]) ;
+                }if ( objetivo == "Minimizar"){
+                    B_i_auxiliar[i] = parseFloat((B_i_auxiliar[fila_pivote] * matriz_final[i][columna_pivote]) + B_i[i]) ;
+                }
+                    
+                }
+            }
+        }
+        console.log("Valores de B_i en primera fase");
+        console.log(B_i);
+        
+
+        // Insertando los B_i a la tabla
+        for (let i = 0; i < n_restricciones; i++) {
+            document.getElementById("tbody_mat"+(auxiliar+1)).innerHTML += '<tr id="tbody_m_'+(i+1)+'_'+(auxiliar+1)+'">';
+            if (Number.isInteger(B_i_auxiliar[i])) {
+                auxi = B_i_auxiliar[i];
+                document.getElementById('tbody_m_'+(i+1)+'_'+(auxiliar+1)).innerHTML +='<th>'+auxi+'</th>';
+            }else{
+                document.getElementById('tbody_m_'+(i+1)+'_'+(auxiliar+1)).innerHTML +='<th>'+B_i_auxiliar[i].toFixed(2)+'</th>';
+            }
+            document.getElementById("tbody_mat"+(auxiliar+1)).innerHTML +='</tr>'; 
+        } 
+
+        // INSERTANDO FOTTER DE PRIMERA FASE
+        for (let i = 0; i < n_restricciones; i++) {
+            document.getElementById('tfoot_fin'+(auxiliar+1)).innerHTML += '<tr id="tfoot_fin_'+(auxiliar+1)+'">';
+            document.getElementById('tfoot_fin'+(auxiliar+1)).innerHTML +='</tr>';
+        }   
+        for (let i = 0; i <= largo_tabla; i++) {
+            if (i==0) {
+                document.getElementById('tfoot_fin_'+(auxiliar+1)).innerHTML +='<th></th>';
+            }else if (i==1) {
+                document.getElementById('tfoot_fin_'+(auxiliar+1)).innerHTML +='<th class="table-active">Z=</th>';
+            }else if ( i>2 && i<largo_tabla ){   
+                auxi = 0;
+
+                if (C_x[i-3].charAt(0) == "R" ) {
+                    for (let y = 0; y < n_restricciones; y++) {
+                        auxi += (matriz_final_auxiliar[y][i-3] * val_Cx[y]);                    
+                    }
+                    document.getElementById('tfoot_fin_'+(auxiliar+1)).innerHTML +='<th>'+(auxi-1)+'</th>';
+                    val_Z[i-3] = auxi;
+                }else{
+                    for (let y = 0; y < n_restricciones; y++) {
+                        auxi += (matriz_final_auxiliar[y][i-3] * val_Cx[y]);                
+                    }
+                    document.getElementById('tfoot_fin_'+(auxiliar+1)).innerHTML +='<th>'+auxi+'</th>';
+                    val_Z[i-3] = auxi;
+                }    
+            }else if(i == largo_tabla) {
+                auxi = 0;
+                for (let y = 0; y < n_restricciones; y++) {
+                    auxi += (B_i_auxiliar[y] * val_Cx[y]);      
+                } 
+                document.getElementById('tfoot_fin_'+(auxiliar+1)).innerHTML +='<th>'+auxi+'</th>';
+                val_Z[i-3] = auxi;          
+                
+            } 
+        }
+
+        // Los valores actuales pasan a ser los valores actiales de la MATRIZ_FINAL
+        auxi =  n_variables+variable_aux;;
+        for (let i = 0; i < n_restricciones; i++) {
+            B_i[i] = B_i_auxiliar[i];
+            for (let y = 0; y < tam_matriz; y++) {
+                matriz_final[i][y] = matriz_final_auxiliar[i][y];
+            }                
+        }
+        // let tam_mat = tam_matriz -1;
+        // Determinando el nuevo elemento pivote
         if ( objetivo == "Maximizar"){
-            if (val_Z[val_Z.length-1] >= 0 ) {
+            let auxi = 0;
+            for (let i = 0; i < tam_mat; i++) {
+                if (val_Z[i] < auxi) {
+                    auxi = val_Z[i];
+                    columna_pivote = i;
+                }
+            }
+            let auxiliar_columna_pivote = new Array();
+            for (let i = 0; i < n_restricciones; i++) {
+                if (matriz_final[i][columna_pivote] == 0) {
+                    auxiliar_columna_pivote [i] = 0;  
+                }else {
+                    auxiliar_columna_pivote [i] = B_i[i] / matriz_final[i][columna_pivote]; 
+                }
+            }
+            auxi = 1;
+            for (let i = 0; i < n_restricciones; i++) {
+                if (auxiliar_columna_pivote[i] <= auxi && auxiliar_columna_pivote[i] != 0) {
+                    auxi = auxiliar_columna_pivote[i];
+                    fila_pivote = i;
+                }
+            }
+    
+        }else if (objetivo == "Minimizar"){
+            let auxi = 0;
+            for (let i = 0; i < tam_mat; i++) {
+                if (val_Z[i] > auxi) {
+                    auxi = val_Z[i];
+                    columna_pivote = i;
+                }
+            }
+            let auxiliar_columna_pivote = new Array();
+            for (let i = 0; i < n_restricciones; i++) {
+                if (matriz_final[i][columna_pivote] == 0) {
+                    auxiliar_columna_pivote [i] = 0;  
+                }else {
+                    auxiliar_columna_pivote [i] = B_i[i] / matriz_final[i][columna_pivote]; 
+                }
+            }
+            auxi = 1;
+            for (let i = 0; i < n_restricciones; i++) {
+                if (auxiliar_columna_pivote[i] <= auxi && auxiliar_columna_pivote[i] != 0) {
+                    auxi = auxiliar_columna_pivote[i];
+                    fila_pivote = i;
+                }
+            }
+        }
+
+        // Aumentando el número de iteraciones de la fase
+        auxiliar++;
+
+        // verificación para la terminación de la primera fase en minimización            
+        if ( objetivo == "Maximizar"){
+            if (val_Z[val_Z.length-1] >= 0) {
                 validacion_max = 1;
                 document.getElementById("primera_fase").innerHTML += '<p style="font-size: 1.2rem; color: aliceblue;">Se finalizaron las iteraciones de la primera fase y existe alguna solución posible para el problema. </p> <br>'
             }else if (val_Z[val_Z.length-1] < 0) {
                 validacion_max = 0;
-                if (auxiliar == 0) {
-                    document.getElementById("primera_fase").innerHTML += '<p style="font-size: 1.2rem; color: aliceblue;">Ingresa la variable '+C_x[fila_pivote-1]+' y sale de la base la variable '+val_Xb[fila_pivote]+'. El elemento pivote es '+matriz_final[fila_pivote][columna_pivote]+'. </p> <br>'
-                }else{
-                    document.getElementById("primera_fase").innerHTML += '<p style="font-size: 1.2rem; color: aliceblue;">Ingresa la variable '+C_x[fila_pivote]+' y sale de la base la variable '+val_Xb[fila_pivote]+'. El elemento pivote es '+matriz_final[fila_pivote][columna_pivote]+'. </p> <br>'
-                }
-            } 
-            auxiliar++; 
+                document.getElementById("primera_fase").innerHTML += '<p style="font-size: 1.2rem; color: aliceblue;">Ingresa la variable '+C_x[fila_pivote]+' y sale de la base la variable '+val_Xb[fila_pivote]+'. El elemento pivote es '+matriz_final[fila_pivote][columna_pivote]+'. </p> <br>'
+            }  
         }if ( objetivo == "Minimizar"){
-            if (val_Z[val_Z.length-1] <= 0 ) {
+            if (val_Z[val_Z.length-1] <= 0) {
                 validacion_min = 1;
                 document.getElementById("primera_fase").innerHTML += '<p style="font-size: 1.2rem; color: aliceblue;">Se finalizaron las iteraciones de la primera fase y existe alguna solución posible para el problema. </p> <br>'
             }else if (val_Z[val_Z.length-1] > 0) {
                 validacion_min = 0;
-                if (auxiliar == 0) {
-                    document.getElementById("primera_fase").innerHTML += '<p style="font-size: 1.2rem; color: aliceblue;">Ingresa la variable '+C_x[fila_pivote-1]+' y sale de la base la variable '+val_Xb[fila_pivote]+'. El elemento pivote es '+matriz_final[fila_pivote][columna_pivote]+'. </p> <br>'
-                }else{
-                    document.getElementById("primera_fase").innerHTML += '<p style="font-size: 1.2rem; color: aliceblue;">Ingresa la variable '+C_x[fila_pivote]+' y sale de la base la variable '+val_Xb[fila_pivote]+'. El elemento pivote es '+matriz_final[fila_pivote][columna_pivote]+'. </p> <br>'
-                }
+                document.getElementById("primera_fase").innerHTML += '<p style="font-size: 1.2rem; color: aliceblue;">Ingresa la variable '+C_x[fila_pivote]+' y sale de la base la variable '+val_Xb[fila_pivote]+'. El elemento pivote es '+matriz_final[fila_pivote][columna_pivote]+'. </p> <br>'
             }  
-            auxiliar++
         }
-        console.log("Valores de Cx fuera de ciclo");
-        console.log(C_x);
+                                
+        // }
         
-
-        auxiliar = 0;
-        while (validacion_max == 0 || validacion_min == 0) {
-
-            console.log("Valores de Z antes (fase 1)");
-            console.log(val_Z);
-            
-            // Titulo tabla
-            document.getElementById("primera_fase").innerHTML += '<center> <br> <h5>Iteración Num. '+(auxiliar+1)+'</h5> <br> </center>';
-            
-            // tabla numerada por cada iteración de 
-            document.getElementById("primera_fase").innerHTML += '<table id="tabla_'+(auxiliar+1)+'" class="table table-light" style="table-layout: fixed !important; border-radius: 8px !important; text-align: center !important; width: auto !important; " >';
-            document.getElementById("tabla_"+(auxiliar+1)).innerHTML += '<thead id="thead_encab'+(auxiliar+1)+'"> </thead>';
-            document.getElementById("tabla_"+(auxiliar+1)).innerHTML += '<tbody id="tbody_mat'+(auxiliar+1)+'"></tbody>';
-            document.getElementById("tabla_"+(auxiliar+1)).innerHTML += '<tfoot id="tfoot_fin'+(auxiliar+1)+'"> </tfoot>';
-            document.getElementById("primera_fase").innerHTML += '</table>';
-
-            // largo_tabla = C_x.length+2;
-            // Agregando encabezado 1 para cada tabla
-            document.getElementById("thead_encab"+(auxiliar+1)).innerHTML += '<tr id="encab_'+(auxiliar+1)+'">';
-            for (let i = 0; i < largo_tabla; i++) {
-                if (i==0) {
-                    document.getElementById("encab_"+(auxiliar+1)).innerHTML +='<th class="table-active"></th>';
-                }else if (i==1) {
-                    document.getElementById("encab_"+(auxiliar+1)).innerHTML +='<th class="table-active">Cj</th>';
-                }else if (C_x[i-2].charAt(0) == "R" ) {
-                    // Maximizar (-1) y Minimizar (+1)
-                    if ( objetivo == "Maximizar"){
-                        document.getElementById("encab_"+(auxiliar+1)).innerHTML +='<th>-1</th>';
-                    }if ( objetivo == "Minimizar"){
-                        document.getElementById("encab_"+(auxiliar+1)).innerHTML +='<th>1</th>';
-                    }                    
-                } else{
-                    document.getElementById("encab_"+(auxiliar+1)).innerHTML +='<th>0</th>';
-                }        
-            } 
-            document.getElementById("thead_encab"+(auxiliar+1)).innerHTML +='</tr>';
-            
-            // Agregando encabezado 2
-            document.getElementById("thead_encab"+(auxiliar+1)).innerHTML +='<tr id="encab_0'+(auxiliar+1)+'" class="table-active">';
-            for (let i = 0; i < largo_tabla; i++) {
-                if (i==0) {
-                    document.getElementById("encab_0"+(auxiliar+1)).innerHTML +='<th class="table-active">Cx</th>';
-                }else if (i==1) {
-                    document.getElementById("encab_0"+(auxiliar+1)).innerHTML +='<th class="table-active">Xb</th>';
-                }else{
-                    document.getElementById("encab_0"+(auxiliar+1)).innerHTML +='<th>'+C_x[i-2]+'</th>';
-                }
-            } 
-            document.getElementById("thead_encab"+(auxiliar+1)).innerHTML +='</tr>';
-
-            // BODY - Ingresando la nueva variable y sacando la antigua de la base
-            val_Xb[fila_pivote] = C_x[columna_pivote];
-            if (val_Xb[fila_pivote].charAt(0) == "R" ) { 
-                if ( objetivo == "Maximizar"){
-                    val_Cx[fila_pivote] = -1;
-                }if ( objetivo == "Minimizar"){
-                    val_Cx[fila_pivote] = 1;
-                }                
-            }else{
-                val_Cx[fila_pivote] = 0;
-            }
-            
-            // Ingresando columna C_X y columna de Xb
-            for (let i = 0; i < n_restricciones; i++) {
-                document.getElementById("tbody_mat"+(auxiliar+1)).innerHTML += '<tr id="tbody_m_'+(i+1)+'_'+(auxiliar+1)+'">';
-                document.getElementById('tbody_m_'+(i+1)+'_'+(auxiliar+1)).innerHTML +='<th>'+val_Cx[i]+'</th>'; 
-                document.getElementById("tbody_mat"+(auxiliar+1)).innerHTML +='</tr>'; 
-            }
-            for (let i = 0; i < n_restricciones; i++) {
-                document.getElementById("tbody_mat"+(auxiliar+1)).innerHTML += '<tr id="tbody_m_'+(i+1)+'_'+(auxiliar+1)+'">';
-                document.getElementById('tbody_m_'+(i+1)+'_'+(auxiliar+1)).innerHTML +='<th class="table-active">'+val_Xb[i]+'</th>'; 
-                document.getElementById("tbody_mat"+(auxiliar+1)).innerHTML +='</tr>'; 
-            }
-
-            // INSERTANDO LA MATRIZ_FINAL
-            tam_matriz = n_variables+variable_aux;
-            for (let i = 0; i < n_restricciones; i++) {
-                for (let y = 0; y < tam_matriz; y++) {
-                    if (i == fila_pivote) {
-                        if (matriz_final[i][y] == 0) {
-                            matriz_final_auxiliar [i][y] = 0; 
-                        }else if(matriz_final[i][y] != 0){ 
-                            matriz_final_auxiliar[i][y] = matriz_final[i][y] * (1 / matriz_final[fila_pivote][columna_pivote]);
-                        }
-                    }
-                }       
-            }
-            for (let i = 0; i < n_restricciones; i++) {
-                for (let y = 0; y < tam_matriz; y++) {
-                    if (i != fila_pivote) { 
-                        if (matriz_final[i][columna_pivote] == 0) {
-                            matriz_final_auxiliar[i][y] = (matriz_final_auxiliar[fila_pivote][y] * matriz_final[i][columna_pivote])+ matriz_final[i][y];
-                        }else {
-                            
-                            if ( objetivo == "Maximizar"){
-                                matriz_final_auxiliar[i][y] = (matriz_final_auxiliar[fila_pivote][y] * -matriz_final[i][columna_pivote])+ matriz_final[i][y];
-                            }if ( objetivo == "Minimizar"){
-                                matriz_final_auxiliar[i][y] = (matriz_final_auxiliar[fila_pivote][y] * matriz_final[i][columna_pivote])+ matriz_final[i][y];
-                            }
-                            
-                        }
-                    }
-                }    
-            }
-            // INSERTANDO LA MATRIZ_FINAL_AUXILIAR
-            for (let i = 0; i < n_restricciones; i++) {
-                document.getElementById("tbody_mat"+(auxiliar+1)).innerHTML += '<tr id="tbody_m_'+(i+1)+'_'+(auxiliar+1)+'">';
-                for (let y = 0; y < tam_matriz; y++) {
-                    if (Number.isInteger(matriz_final_auxiliar[i][y])) {
-                        auxi = matriz_final_auxiliar[i][y];
-                        document.getElementById('tbody_m_'+(i+1)+'_'+(auxiliar+1)).innerHTML +='<th>'+auxi+'</th>';
-                    }else{
-                        document.getElementById('tbody_m_'+(i+1)+'_'+(auxiliar+1)).innerHTML +='<th>'+matriz_final_auxiliar[i][y].toFixed(2)+'</th>';
-                    }
-                }
-                document.getElementById("tbody_mat"+(auxiliar+1)).innerHTML +='</tr>';  
-            }
-
-            // INSERTANDO LOS BI - primero la fila piv y después las demás
-            for (let i = 0; i < n_restricciones; i++) {
-                if (i == fila_pivote) {
-                    if (B_i[i]== 0) {
-                        B_i_auxiliar [i]= 0; 
-                    }else if(B_i[i] != 0){ 
-                        B_i_auxiliar[i] = B_i[i] * (1 / matriz_final[fila_pivote][columna_pivote]);
-                    }
-                }
-            }
-            for (let i = 0; i < n_restricciones; i++) {
-                if (i != fila_pivote) { 
-                    if (matriz_final[i][columna_pivote] == 0) {
-                        B_i_auxiliar[i] = B_i[i];
-                    }else {
-                        
-                    if ( objetivo == "Maximizar"){
-                        B_i_auxiliar[i] = parseFloat((B_i_auxiliar[fila_pivote] * -matriz_final[i][columna_pivote]) + B_i[i]) ;
-                    }if ( objetivo == "Minimizar"){
-                        B_i_auxiliar[i] = parseFloat((B_i_auxiliar[fila_pivote] * matriz_final[i][columna_pivote]) + B_i[i]) ;
-                    }
-                        
-                    }
-                }
-            }
-            console.log("Valores de B_i en primera fase");
-            console.log(B_i);
-            
-
-            // Insertando los B_i a la tabla
-            for (let i = 0; i < n_restricciones; i++) {
-                document.getElementById("tbody_mat"+(auxiliar+1)).innerHTML += '<tr id="tbody_m_'+(i+1)+'_'+(auxiliar+1)+'">';
-                if (Number.isInteger(B_i_auxiliar[i])) {
-                    auxi = B_i_auxiliar[i];
-                    document.getElementById('tbody_m_'+(i+1)+'_'+(auxiliar+1)).innerHTML +='<th>'+auxi+'</th>';
-                }else{
-                    document.getElementById('tbody_m_'+(i+1)+'_'+(auxiliar+1)).innerHTML +='<th>'+B_i_auxiliar[i].toFixed(2)+'</th>';
-                }
-                document.getElementById("tbody_mat"+(auxiliar+1)).innerHTML +='</tr>'; 
-            } 
-
-            // INSERTANDO FOTTER DE PRIMERA FASE
-            for (let i = 0; i < n_restricciones; i++) {
-                document.getElementById('tfoot_fin'+(auxiliar+1)).innerHTML += '<tr id="tfoot_fin_'+(auxiliar+1)+'">';
-                document.getElementById('tfoot_fin'+(auxiliar+1)).innerHTML +='</tr>';
-            }   
-            for (let i = 0; i <= largo_tabla; i++) {
-                if (i==0) {
-                    document.getElementById('tfoot_fin_'+(auxiliar+1)).innerHTML +='<th></th>';
-                }else if (i==1) {
-                    document.getElementById('tfoot_fin_'+(auxiliar+1)).innerHTML +='<th class="table-active">Z=</th>';
-                }else if ( i>2 && i<largo_tabla ){   
-                    auxi = 0;
-
-                    if (C_x[i-3].charAt(0) == "R" ) {
-                        for (let y = 0; y < n_restricciones; y++) {
-                            auxi += (matriz_final_auxiliar[y][i-3] * val_Cx[y]);                    
-                        }
-                        document.getElementById('tfoot_fin_'+(auxiliar+1)).innerHTML +='<th>'+(auxi-1)+'</th>';
-                        val_Z[i-3] = auxi;
-                    }else{
-                        for (let y = 0; y < n_restricciones; y++) {
-                            auxi += (matriz_final_auxiliar[y][i-3] * val_Cx[y]);                
-                        }
-                        document.getElementById('tfoot_fin_'+(auxiliar+1)).innerHTML +='<th>'+auxi+'</th>';
-                        val_Z[i-3] = auxi;
-                    }    
-                }else if(i == largo_tabla) {
-                    auxi = 0;
-                    for (let y = 0; y < n_restricciones; y++) {
-                        auxi += (B_i_auxiliar[y] * val_Cx[y]);      
-                    } 
-                    document.getElementById('tfoot_fin_'+(auxiliar+1)).innerHTML +='<th>'+auxi+'</th>';
-                    val_Z[i-3] = auxi;          
-                    
-                } 
-            }
-
-            // Los valores actuales pasan a ser los valores actiales de la MATRIZ_FINAL
-            auxi =  n_variables+variable_aux;;
-            for (let i = 0; i < n_restricciones; i++) {
-                B_i[i] = B_i_auxiliar[i];
-                for (let y = 0; y < tam_matriz; y++) {
-                    matriz_final[i][y] = matriz_final_auxiliar[i][y];
-                }                
-            }
-            // let tam_mat = tam_matriz -1;
-            // Determinando el nuevo elemento pivote
-            if ( objetivo == "Maximizar"){
-                let auxi = 0;
-                for (let i = 0; i < tam_mat; i++) {
-                    if (val_Z[i] < auxi) {
-                        auxi = val_Z[i];
-                        columna_pivote = i;
-                    }
-                }
-                let auxiliar_columna_pivote = new Array();
-                for (let i = 0; i < n_restricciones; i++) {
-                    if (matriz_final[i][columna_pivote] == 0) {
-                        auxiliar_columna_pivote [i] = 0;  
-                    }else {
-                        auxiliar_columna_pivote [i] = B_i[i] / matriz_final[i][columna_pivote]; 
-                    }
-                }
-                auxi = 1;
-                for (let i = 0; i < n_restricciones; i++) {
-                    if (auxiliar_columna_pivote[i] <= auxi && auxiliar_columna_pivote[i] != 0) {
-                        auxi = auxiliar_columna_pivote[i];
-                        fila_pivote = i;
-                    }
-                }
-        
-            }else if (objetivo == "Minimizar"){
-                let auxi = 0;
-                for (let i = 0; i < tam_mat; i++) {
-                    if (val_Z[i] > auxi) {
-                        auxi = val_Z[i];
-                        columna_pivote = i;
-                    }
-                }
-                let auxiliar_columna_pivote = new Array();
-                for (let i = 0; i < n_restricciones; i++) {
-                    if (matriz_final[i][columna_pivote] == 0) {
-                        auxiliar_columna_pivote [i] = 0;  
-                    }else {
-                        auxiliar_columna_pivote [i] = B_i[i] / matriz_final[i][columna_pivote]; 
-                    }
-                }
-                auxi = 1;
-                for (let i = 0; i < n_restricciones; i++) {
-                    if (auxiliar_columna_pivote[i] <= auxi && auxiliar_columna_pivote[i] != 0) {
-                        auxi = auxiliar_columna_pivote[i];
-                        fila_pivote = i;
-                    }
-                }
-            }
-
-            // Aumentando el número de iteraciones de la fase
-            auxiliar++;
-
-            // verificación para la terminación de la primera fase en minimización            
-            if ( objetivo == "Maximizar"){
-                if (val_Z[val_Z.length-1] >= 0) {
-                    validacion_max = 1;
-                    document.getElementById("primera_fase").innerHTML += '<p style="font-size: 1.2rem; color: aliceblue;">Se finalizaron las iteraciones de la primera fase y existe alguna solución posible para el problema. </p> <br>'
-                }else if (val_Z[val_Z.length-1] < 0) {
-                    validacion_max = 0;
-                    document.getElementById("primera_fase").innerHTML += '<p style="font-size: 1.2rem; color: aliceblue;">Ingresa la variable '+C_x[fila_pivote]+' y sale de la base la variable '+val_Xb[fila_pivote]+'. El elemento pivote es '+matriz_final[fila_pivote][columna_pivote]+'. </p> <br>'
-                }  
-            }if ( objetivo == "Minimizar"){
-                if (val_Z[val_Z.length-1] <= 0) {
-                    validacion_min = 1;
-                    document.getElementById("primera_fase").innerHTML += '<p style="font-size: 1.2rem; color: aliceblue;">Se finalizaron las iteraciones de la primera fase y existe alguna solución posible para el problema. </p> <br>'
-                }else if (val_Z[val_Z.length-1] > 0) {
-                    validacion_min = 0;
-                    document.getElementById("primera_fase").innerHTML += '<p style="font-size: 1.2rem; color: aliceblue;">Ingresa la variable '+C_x[fila_pivote]+' y sale de la base la variable '+val_Xb[fila_pivote]+'. El elemento pivote es '+matriz_final[fila_pivote][columna_pivote]+'. </p> <br>'
-                }  
-            }
-                                  
-            // }
-            
-            console.log("Valores de Z después (fase 1)");
-            console.log(val_Z);
-            console.log("Validación (1:stop  - 0:sigue): "+validacion_max+" -> con z="+val_Z[val_Z.length-1]);
-        }
+        console.log("Valores de Z después (fase 1)");
+        console.log(val_Z);
+        console.log("Validación (1:stop  - 0:sigue): "+validacion_max+" -> con z="+val_Z[val_Z.length-1]);
+    }
         
     
     
