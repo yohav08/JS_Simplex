@@ -433,7 +433,7 @@ function Generar_simplex(){
     if ( objetivo == "Maximizar"){
         let auxi = 0;
         for (let i = 0; i < tam_mat; i++) {
-            if (val_Z[i] < auxi) {
+            if (val_Z[i] < auxi && val_Z[i]!=0) {
                 auxi = val_Z[i];
                 columna_pivote = i;
             }
@@ -456,7 +456,7 @@ function Generar_simplex(){
     }else if (objetivo == "Minimizar"){
         let auxi = 0;
         for (let i = 0; i < tam_mat; i++) {
-            if (val_Z[i] > auxi) {
+            if (val_Z[i] > auxi && val_Z[i]!=0) {
                 auxi = val_Z[i];
                 columna_pivote = i;
             }
@@ -817,6 +817,8 @@ function Generar_simplex(){
         // console.log("Valores de Z después (fase 1)");
         console.log(val_Z);
         console.log("Validación (1:stop  - 0:sigue): "+validacion_max+" -> con z="+val_Z[val_Z.length-1]);
+
+    
     }
 
     // MATRIZ INICIAL SEGUNDA FASE 
@@ -982,26 +984,6 @@ function Generar_simplex(){
         }
     }
 
-    // PROGRAMANDO LA SEGUNDA FASE 
-    let matriz_final_2 = new Array(n_restricciones);
-    for (let i = 0; i < n_restricciones; i++) {
-        matriz_final_2[i] = new Array(tam_matriz);
-    }
-    for (let i = 0; i < n_restricciones; i++) {
-        for (let y = 0; y < tam_matriz; y++) {
-            matriz_final_2[i][y] = matriz_final[i][y];
-        }
-    }
-    let matriz_final_auxiliar_2 = new Array(n_restricciones);
-    for (let i = 0; i < n_restricciones; i++) {
-        matriz_final_auxiliar_2[i] = new Array(tam_matriz);
-    }
-    for (let i = 0; i < n_restricciones; i++) {
-        for (let y = 0; y < tam_matriz; y++) {
-            matriz_final_auxiliar_2[i][y] = matriz_final_2[i][y];
-        }
-    }
-
     console.log ("Valores (Z, Cx, Xb, val_cx)");
     console.log (C_x);
     console.log (val_Z);
@@ -1013,33 +995,36 @@ function Generar_simplex(){
     if ( objetivo == "Maximizar"){
         let auxi = 0;
         for (let i = 0; i < tam_mat; i++) {
-            if (val_Z[i] < auxi) {
+            if (val_Z[i] < auxi &&  val_Z[i] != 0) {
                 auxi = val_Z[i];
                 columna_pivote = i;
             }
         }
         let auxiliar_columna_pivote = new Array();
         for (let i = 0; i < n_restricciones; i++) {
-            if (matriz_final_2[i][columna_pivote] == 0) {
+            if (matriz_final[i][columna_pivote] == 0) {
                 auxiliar_columna_pivote [i] = 0;  
             }else {
-                auxiliar_columna_pivote [i] = B_i[i] / matriz_final_2[i][columna_pivote]; 
+                // auxiliar_columna_pivote [i] = B_i[i] / matriz_final[i][columna_pivote].toFixed(2); 
+                auxiliar_columna_pivote [i] = (B_i[i] / matriz_final[i][columna_pivote]);
+                // console.log("aux: "+auxiliar_columna_pivote[i]);
             }
         }
-        auxi = 1;
-        for (let i = 0; i < n_restricciones; i++) {
-            if (auxiliar_columna_pivote[i] <= auxi && auxiliar_columna_pivote[i] != 0) {
+        auxi = 0;
+        for (let i = n_restricciones; i >=0; i--) {
+            if (auxiliar_columna_pivote[i] > auxi) {
                 auxi = auxiliar_columna_pivote[i];
                 fila_pivote = i;
+
             }
         }
     }
     
     validacion_max = 1;
 
-    // verificación para la terminación de la segunda fase en maximización       
-    auxi = 0; 
+    // verificación para la terminación de la segunda fase en maximización 
     // solucion_textual += '<p style="font-size: 1.2rem; color: aliceblue;">';
+    auxiliar = 0;
     if ( objetivo == "Maximizar"){
         for (let i = 0; i < val_Z.length; i++) {
             if (val_Z[i] >= 0 ) {
@@ -1049,10 +1034,11 @@ function Generar_simplex(){
                 break;
             } 
         }
-        auxi++; 
     }
     let solucion_textual = '';
-    auxiliar = 0;     
+    
+
+    // Validando 
     if ( objetivo == "Maximizar"){
         if (validacion_max == 1 ) {
             document.getElementById("mat_segunda").innerHTML += '<p style="font-size: 1.2rem; color: aliceblue;"> La solución óptima es Z = '+val_Z[val_Z.length-1]+' <br>( -';
@@ -1061,9 +1047,8 @@ function Generar_simplex(){
             }
             document.getElementById("mat_segunda").innerHTML += solucion_textual+')</p> <br>'
         }else if (validacion_max == 0) {
-            auxi = ''+C_x[fila_pivote-1];
             // if (auxiliar == 0) {
-                document.getElementById("mat_segunda").innerHTML += '<p style="font-size: 1.2rem; color: aliceblue;">Ingresa la variable '+auxi+' y sale de la base la variable '+val_Xb[fila_pivote]+'. El elemento pivote es '+matriz_final[fila_pivote][columna_pivote]+'. </p> <br>'
+                document.getElementById("mat_segunda").innerHTML += '<p style="font-size: 1.2rem; color: aliceblue;">Ingresa la variable '+C_x[fila_pivote]+' y sale de la base la variable '+val_Xb[fila_pivote]+'. El elemento pivote es '+matriz_final[fila_pivote][columna_pivote]+'. </p> <br>'
             // }else{
             //     document.getElementById("mat_segunda").innerHTML += '<p style="font-size: 1.2rem; color: aliceblue;">Ingresa la variable '+C_x[fila_pivote]+' y sale de la base la variable '+val_Xb[fila_pivote]+'. El elemento pivote es '+matriz_final[fila_pivote][columna_pivote]+'. </p> <br>'
             // }
@@ -1074,27 +1059,315 @@ function Generar_simplex(){
 
     document.getElementById("segunda_fase").innerHTML = '';
 
-    auxi = 0, auxiliar = 0;
+    // PROGRAMANDO LA SEGUNDA FASE 
+
+    let matriz_final_auxiliar_2 = new Array(n_restricciones);
+    for (let i = 0; i < n_restricciones; i++) {
+        matriz_final_auxiliar_2[i] = new Array(tam_matriz);
+    }
+    for (let i = 0; i < n_restricciones; i++) {
+        for (let y = 0; y < tam_matriz; y++) {
+            matriz_final_auxiliar_2[i][y] = matriz_final[i][y];
+        }
+    }
+    
+    console.log(matriz_final);    
+    console.log(C_x);
+
     console.log("----ITERACIONES DE SIMPLEX EN SU _SEGUNDA_ FASE----");
+
+    
     // console.log("Valores de Cx fuera de ciclo");
+
+
+    auxi = 0, auxiliar = 0;
+    while (validacion_max == 0) {
+        console.log(val_Z);
+        
+        
+        // Titulo tabla
+        document.getElementById("segunda_fase").innerHTML += '<center> <br> <h5>Iteración Num. '+(auxiliar+1)+'</h5> <br> </center>';
+        
+        // tabla numerada por cada iteración de 
+        document.getElementById("segunda_fase").innerHTML += '<table id="tabla_2f_'+(auxiliar+1)+'" class="table table-light" style="table-layout: fixed !important; border-radius: 8px !important; text-align: center !important; width: auto !important; " >';
+        document.getElementById("tabla_2f_"+(auxiliar+1)).innerHTML += '<thead id="thead2F_en'+(auxiliar+1)+'"> </thead>';
+        document.getElementById("tabla_2f_"+(auxiliar+1)).innerHTML += '<tbody id="tbody2F_sim'+(auxiliar+1)+'"></tbody>';
+        document.getElementById("tabla_2f_"+(auxiliar+1)).innerHTML += '<tfoot id="tfoot2F_fin'+(auxiliar+1)+'"> </tfoot>';
+        document.getElementById("segunda_fase").innerHTML += '</table>';
+
+
+        // Primer encabezado
+        
+        tam_mat = n_variables+variable_aux-variable_r+3;
+        document.getElementById("thead2F_en"+(auxiliar+1)).innerHTML += '<tr id="1encab_'+(auxiliar+1)+'">';
+        for (let i = 0; i < tam_mat; i++) {
+            if (i==0) {
+                document.getElementById("1encab_"+(auxiliar+1)).innerHTML +='<th class="table-active"></th>';
+            }else if (i==1) {
+                document.getElementById("1encab_"+(auxiliar+1)).innerHTML +='<th class="table-active">Cj</th>';
+            }else {
+                document.getElementById("1encab_"+(auxiliar+1)).innerHTML +='<th>'+funcion[i-2]+'</th>';
+            }     
+        } 
+        document.getElementById("thead2F_en"+(auxiliar+1)).innerHTML +='</tr>';
+        // Agregando encabezado 2
+        document.getElementById("thead2F_en"+(auxiliar+1)).innerHTML +='<tr id="2encab_'+(auxiliar+1)+'" class="table-active">';
+        for (let i = 0; i < tam_mat; i++) {
+            if (i==0) {
+                document.getElementById("2encab_"+(auxiliar+1)).innerHTML +='<th class="table-active">Cx</th>';
+            }else if (i==1) {
+                document.getElementById("2encab_"+(auxiliar+1)).innerHTML +='<th class="table-active">Xb</th>';
+            }else{
+                document.getElementById("2encab_"+(auxiliar+1)).innerHTML +='<th>'+C_x[i-2]+'</th>';
+            }
+        } 
+        document.getElementById("thead2F_en"+(auxiliar+1)).innerHTML +='</tr>';
+
+        // BODY - Ingresando la nueva variable y sacando la antigua de la base
+        val_Xb[fila_pivote] = C_x[columna_pivote];
+        val_Cx[fila_pivote] = funcion[columna_pivote];        
+
+        for (let i = 0; i < n_restricciones; i++) {
+            if (val_Xb[i] == "X"+(auxi+1) ) { 
+                for (let y = 0; y < C_x.length; y++) {
+                    if (C_x[y] == val_Xb[i] ) {
+                        val_Cx[i] = funcion[auxi];
+                    }
+                } 
+                auxi ++;
+            }        
+        }
     
-    console.log(matriz_final_2);    
+        // BODY - COLUMNA DE LOS Cx y los xb
+        for (let i = 0; i < n_restricciones; i++) {
+            document.getElementById("tbody2F_sim"+(auxiliar+1)).innerHTML += '<tr id="tbody_sim2F_'+(i+1)+'_'+(auxiliar+1)+'">';
+            document.getElementById('tbody_sim2F_'+(i+1)+'_'+(auxiliar+1)).innerHTML +='<th>'+val_Cx[i]+'</th>'; 
+            document.getElementById("tbody2F_sim"+(auxiliar+1)).innerHTML +='</tr>'; 
+        }
+        for (let i = 0; i < n_restricciones; i++) {
+            document.getElementById("tbody2F_sim"+(auxiliar+1)).innerHTML += '<tr id="tbody_sim2F_'+(i+1)+'_'+(auxiliar+1)+'">';
+            document.getElementById('tbody_sim2F_'+(i+1)+'_'+(auxiliar+1)).innerHTML +='<th class="table-active">'+val_Xb[i]+'</th>'; 
+            document.getElementById("tbody2F_sim"+(auxiliar+1)).innerHTML +='</tr>'; 
+        }
 
+        // INSERTANDO LA MATRIZ_FINAL
+        tam_mat = n_variables+variable_aux-variable_r;
+        matriz_final[fila_pivote][columna_pivote] = 1;
+        for (let i = 0; i < n_restricciones; i++) {
+            for (let y = 0; y < tam_mat; y++) {
+                if (i == fila_pivote) {
+                    if (matriz_final[i][y] == 0) {
+                        matriz_final_auxiliar_2[i][y] = 0; 
+                        
+                    }else if(matriz_final[i][y] != 0){ 
+                        matriz_final_auxiliar_2[i][y] = matriz_final[i][y] * (1 / matriz_final[fila_pivote][columna_pivote]);
+                        // console.log(matriz_final[i][y]+" * (1/"+ matriz_final[fila_pivote][columna_pivote]+"");
+                    }
+                }
+            }       
+        }
+        for (let i = 0; i < n_restricciones; i++) {
+            for (let y = 0; y < tam_mat; y++) {
+                if (i != fila_pivote) { 
+                    if (matriz_final[i][columna_pivote] == 0) {
+                        matriz_final_auxiliar_2[i][y] = (matriz_final_auxiliar_2[fila_pivote][y] * matriz_final[i][columna_pivote])+ matriz_final[i][y];
+                    }else {
+                        matriz_final_auxiliar_2[i][y] = (matriz_final_auxiliar_2[fila_pivote][y] * -matriz_final[i][columna_pivote])+ matriz_final[i][y];
+                    }
+                }
+            }    
+        }
+        // INSERTANDO LA MATRIZ_FINAL_AUXILIAR
+        for (let i = 0; i < n_restricciones; i++) {
+            document.getElementById("tbody2F_sim"+(auxiliar+1)).innerHTML += '<tr id="tbody_sim2F_'+(i+1)+'_'+(auxiliar+1)+'">';
+            for (let y = 0; y < tam_mat; y++) {
+                if (Number.isInteger(matriz_final_auxiliar_2[i][y])) {
+                    auxi = matriz_final_auxiliar_2[i][y];
+                    document.getElementById('tbody_sim2F_'+(i+1)+'_'+(auxiliar+1)).innerHTML +='<th>'+auxi+'</th>';
+                }else{
+                    document.getElementById('tbody_sim2F_'+(i+1)+'_'+(auxiliar+1)).innerHTML +='<th>'+matriz_final_auxiliar_2[i][y].toFixed(2)+'</th>';
+                }
+            }
+            document.getElementById("tbody2F_sim"+(auxiliar+1)).innerHTML +='</tr>';  
+        }
 
-    
-
-
+        // INSERTANDO LOS BI - primero la fila piv y después las demás
+        for (let i = 0; i < n_restricciones; i++) {
+            if (i == fila_pivote) {
+                if (B_i[i]== 0) {
+                    B_i_auxiliar [i]= 0; 
+                }else if(B_i[i] != 0){ 
+                    B_i_auxiliar[i] = B_i[i] * (1 / matriz_final[fila_pivote][columna_pivote]);
+                }
+            }
+        }
+        for (let i = 0; i < n_restricciones; i++) {
+            if (i != fila_pivote) { 
+                if (matriz_final[i][columna_pivote] == 0) {
+                    B_i_auxiliar[i] = B_i[i];
+                }else {
+                    
+                if ( objetivo == "Maximizar"){
+                    B_i_auxiliar[i] = parseFloat((B_i_auxiliar[fila_pivote] * -matriz_final[i][columna_pivote]) + B_i[i]) ;
+                }if ( objetivo == "Minimizar"){
+                    B_i_auxiliar[i] = parseFloat((B_i_auxiliar[fila_pivote] * matriz_final[i][columna_pivote]) + B_i[i]) ;
+                }
+                    
+                }
+            }
+        }
         
 
-    // Segunda fase solo para maximizar - nada más 
+        tam_mat = n_variables+variable_aux-variable_r  
+        for (let i = 0; i < n_restricciones; i++) {
+            for (let y = 0; y < tam_mat; y++) {
+                matriz_final[i][y] = matriz_final_auxiliar[i][y];
+            }                
+            B_i[i] = B_i_auxiliar[i];
+        }
+
+        // console.log("Valores de B_i en segunda fase");
+        console.log(B_i);
+        
+        // Insertando los B_i a la tabla
+        for (let i = 0; i < n_restricciones; i++) {
+            document.getElementById("tbody2F_sim"+(auxiliar+1)).innerHTML += '<tr id="tbody_sim2F_'+(i+1)+'_'+(auxiliar+1)+'">';
+            if (Number.isInteger(B_i_auxiliar[i])) {
+                auxi = B_i_auxiliar[i];
+                document.getElementById('tbody_sim2F_'+(i+1)+'_'+(auxiliar+1)).innerHTML +='<th>'+auxi+'</th>';
+            }else{
+                document.getElementById('tbody_sim2F_'+(i+1)+'_'+(auxiliar+1)).innerHTML +='<th>'+B_i_auxiliar[i].toFixed(2)+'</th>';
+            }
+            document.getElementById("tbody2F_sim"+(auxiliar+1)).innerHTML +='</tr>'; 
+        } 
+
+        tam_mat = n_variables+variable_aux-variable_r;
+        for (let i = 0; i <= tam_mat; i++) {
+            if (i<tam_mat ){   
+                auxi = 0;
+                for (let y = 0; y < n_restricciones; y++) {
+                    auxi += (matriz_final_auxiliar[y][i] * val_Cx[y]);                
+                }
+                val_Z[i] = auxi  -(funcion[i]);
+                    
+            }else if(i == tam_mat) {
+                auxi = 0;
+                for (let y = 0; y < n_restricciones; y++) {
+                    auxi += (B_i_auxiliar[y] * val_Cx[y]);      
+                }                
+                val_Z[i-2] = auxi;
+            } 
+        }
+
+        tam_mat = n_variables+variable_aux-variable_r+2;
+           
+        largo_tabla = C_x.length+2;
+        document.getElementById('tfoot2F_fin'+(auxiliar+1)).innerHTML += '<tr id="tfootF_fin'+(auxiliar+1)+'">';
+        for (let i = 0; i <= largo_tabla; i++) {
+            if (i==0) {
+                document.getElementById('tfootF_fin'+(auxiliar+1)).innerHTML +='<th></th>';
+            }else if (i==1) {
+                document.getElementById('tfootF_fin'+(auxiliar+1)).innerHTML +='<th class="table-active">Z=</th>';
+            }else if ( i>2 && i<largo_tabla ){   
+                auxi = 0;
+
+                for (let y = 0; y < n_restricciones; y++) {
+                    auxi += (matriz_final_auxiliar[y][i-3] * val_Cx[y]); 
+                    console.log ("auxi ("+auxi+") = "+matriz_final_auxiliar[y][i-3]+" * "+val_Cx[y])               
+                }
+                auxi = auxi - funcion[i];
+                if (Number.isInteger(auxi)) {
+                    document.getElementById('tfootF_fin'+(auxiliar+1)).innerHTML +='<th>'+auxi+'</th>';
+                }else{
+                    document.getElementById('tfootF_fin'+(auxiliar+1)).innerHTML +='<th>'+auxi.toFixed(2)+'</th>';
+                }  
+                console.log ("z= "+auxi+" - "+funcion[i-3])
+                val_Z[i-3] = auxi - funcion[i-3];
+    
+            }else if(i == largo_tabla) {
+                auxi = 0;
+                for (let y = 0; y < n_restricciones; y++) {
+                    auxi += (B_i_auxiliar[y] * val_Cx[y]);      
+                } 
+                if (Number.isInteger(auxi)) {
+                    document.getElementById('tfootF_fin'+(auxiliar+1)).innerHTML +='<th>'+auxi+'</th>';
+                }else{
+                    document.getElementById('tfootF_fin'+(auxiliar+1)).innerHTML +='<th>'+auxi.toFixed(2)+'</th>';
+                }                
+                val_Z[i-3] = auxi;
+            } 
+        }
+        document.getElementById('tfoot2F_fin'+(auxiliar+1)).innerHTML +='</tr>';
+
+
+        // Los valores actuales pasan a ser los valores actiales de la MATRIZ_FINAL
+
+
+        tam_mat = n_variables+variable_aux-variable_r;
+        if ( objetivo == "Maximizar"){
+            auxi = 0;
+            for (let i = 0; i < tam_mat; i++) {
+                if (val_Z[i] < auxi) {
+                    auxi = val_Z[i];
+                    columna_pivote = i;
+                }
+            }
+            let auxiliar_columna_pivote = new Array();
+            for (let i = 0; i < n_restricciones; i++) {
+                if (matriz_final[i][columna_pivote] == 0) {
+                    auxiliar_columna_pivote [i] = 0;  
+                }else {
+                    auxiliar_columna_pivote [i] = B_i[i] / matriz_final[i][columna_pivote]; 
+                }
+            }
+            auxi = 1;
+            for (let i = 0; i < n_restricciones; i++) {
+                if (auxiliar_columna_pivote[i] <= auxi && auxiliar_columna_pivote[i] != 0) {
+                    auxi = auxiliar_columna_pivote[i];
+                    fila_pivote = i;
+                }
+            }
+    
+        }
+
+        // verificando continuidad del ciclo
+        for (let i = 0; i < val_Z.length; i++) {
+            if (val_Z[i] >= 0 ) {
+                validacion_max = 1;
+            }else if (val_Z[i] < 0) {
+                validacion_max = 0;
+                break;
+            } 
+        }
+        
+        auxiliar++;
+
+        if (validacion_max == 1 ) {
+            document.getElementById("primera_fase").innerHTML += '<p style="font-size: 1.2rem; color: aliceblue;">Se finalizaron las iteraciones de la primera fase y existe alguna solución posible para el problema. </p> <br>'
+            
+        }else if (validacion_max == 0) {
+            document.getElementById("primera_fase").innerHTML += '<p style="font-size: 1.2rem; color: aliceblue;">Ingresa la variable '+C_x[fila_pivote]+' y sale de la base la variable '+val_Xb[fila_pivote]+'. El elemento pivote es '+matriz_final[fila_pivote][columna_pivote]+'. </p> <br>'
+            
+        } 
+            
+        // console.log("Valores de Z después (fase 1)");
+        console.log(val_Z);
+        console.log("Validación (1:stop  - 0:sigue): "+validacion_max+" -> con z="+val_Z[val_Z.length-1]);
+        
+    }
+
+    
+
+
+
     
 }
 
 
 function Generar_grafico() {
 
-    let  grafic;
-    if (grafic) grafic.destroy();
+    // let  grafic;
+    // if (grafic) grafic.destroy();
     // #filas
     let n_variables = parseFloat(document.getElementById("tam_variables").value);  
     // #columnas
@@ -1127,7 +1400,7 @@ function Generar_grafico() {
     document.getElementById("Fun_objetivo").innerHTML = '';
     document.getElementById("Res_objetivo").innerHTML = '';
 
-    // Agregando la Funcion textual del método gráfico
+    // Agregando la Funcion textual del método gráfico -- TEXTO
     if (objetivo == "Maximizar") {
         document.getElementById("Fun_objetivo").innerHTML += "Maximizar Z = ";
     }else if (objetivo == "Minimizar") {
@@ -1139,6 +1412,8 @@ function Generar_grafico() {
     }else {
         document.getElementById("Fun_objetivo").innerHTML += " + "+funcion[1]+"Y ";
     }
+
+    let restriccion = new Array();
     
     // Agregando el modelo de las restricciones textuales del método gráfico
     for (let i = 0; i < n_restricciones; i++) {
@@ -1153,16 +1428,20 @@ function Generar_grafico() {
                 if (matriz[i][y] < 0) {
                     document.getElementById("Res_objetivo").innerHTML += " "+matriz[i][y]+"Y ";
                     if (rest_1 == "mayor_igual") {
+                        restriccion.push("mayor_igual");
                         document.getElementById("Res_objetivo").innerHTML += " ≥ ";
                         document.getElementById("Res_objetivo").innerHTML += matriz[i][y+1];
         
                     } else if (rest_1 == "menor_igual") {
+                        restriccion.push("menor_igual");
                         document.getElementById("Res_objetivo").innerHTML += " ≤ ";
                         document.getElementById("Res_objetivo").innerHTML += matriz[i][y+1];
                     }
                 }else{
                     document.getElementById("Res_objetivo").innerHTML += " + "+matriz[i][y]+"Y ";
                     if (rest_1 == "mayor_igual") {
+                        
+                        restriccion.push("mayor_igual");
                         document.getElementById("Res_objetivo").innerHTML += " ≥ ";
                         document.getElementById("Res_objetivo").innerHTML += matriz[i][y+1];
         
@@ -1186,19 +1465,30 @@ function Generar_grafico() {
     for (let i = 0; i < n_restricciones; i++) { 
         if (matriz[i][0] == 0) {
             recta_X.push(0)
-            recta_Y.push(matriz[i][2] / matriz[i][1]);
+            recta_Y.push(matriz[i][1] / matriz[i][1]);
             
         }else if(matriz[i][1] == 0){
-            recta_X.push(matriz[i][2] / matriz[i][0]);
+            recta_X.push(matriz[i][1] / matriz[i][0]);
             recta_Y.push(0);
 
         }else {
             coordenadas_X.push(0);
-            coordenadas_Y.push(matriz[i][2] / matriz[i][1]);
-            coordenadas_X.push(matriz[i][2] / matriz[i][0]);
+            coordenadas_Y.push(matriz[i][0] / matriz[i][1]);
+            coordenadas_X.push(matriz[i][1] / matriz[i][0]);
             coordenadas_Y.push(0);
         }  
     }
+
+    let 
+    for (let i = 0; i < n_restricciones; i++) {
+
+        if (recta_X [i] != 0) {
+            
+        }
+        
+    }
+
+    
 
     // Graficar las restricciones
 
@@ -1206,42 +1496,401 @@ function Generar_grafico() {
     // Comenzar a determinar los puntos que delimitan la region factible
     
 
+    console.log("Funcion: ");
+    console.log(funcion);
     console.log("Matriz: ");
     console.log(matriz);
+    console.log("Coordenadas X: ");
+    console.log(coordenadas_X);
+    console.log("Coordenadas Y: ");
+    console.log(coordenadas_Y);
+    
+    
+    // Resolviendo Sistemas de ecuaciones - se le envían los tres 
+    // for (let i = 0; i < n_restricciones; i++) {
+    //     const resultado = SistEcuaciones(matriz[i][0], matriz[i][1], matriz[i][2]);
+        
+    // }
     
 
-    
-    document.getElementById("contenedor_grafica").innerHTML = '';
-    document.getElementById("contenedor_grafica").innerHTML += '<canvas id="grafica_chart" style="background-color: aliceblue; max-width: 100%; height: 50em; width: 94%;"> </canvas>';
-    
+    // if (grafic) {
+    //     grafic.destroy();
+    // } 
 
-    let grafico = document.getElementById("grafica_chart").getContext('2d');
-    
+}
 
-    if (grafic) {
-        grafic.destroy();
-    } 
 
-    let names = ["Grafico", "Simplex", "Simplex 2F"]
-    let edades = [4,5,6]
+function SistEcuaciones (ecuacion1, ecuacion2){
+    console.log("SISTEMA DE ECUACIONES");
 
-    grafic = new Chart(grafico,{
-        type: 'bar',
-        data: {
-            labels: names,
-            datasets: [{
-                label: "Cantidad",
-                data: edades,
-                borderwidth: 1.5
-            }]
+    // if (ecuacion1[2] < 0 && ecuacion1[0] > 0 && ecuacion1[1] > 0) {
+    //     for (let i = 0; i < 3; i++) {
+    //         ecuacion1[i] = ecuacion1[i] + (-1)
+    //     }
+    // }
+
+    // let ecuacion1 = [3,1,90]; // X
+    // let ecuacion2 = [0,1,35]; // Y
+
+    let PuntosX =new Array();
+    let PuntosY =new Array();
+    let aux_x = 0;
+    let aux_y = 0;
+
+
+    console.log(ecuacion1);
+    console.log(ecuacion2);
+
+    if       (ecuacion2[1]!=0 && ecuacion2[0]==0 && ecuacion1[1]!=0 && ecuacion1[0]!=0 ) {
+        
+        if (ecuacion2[1]==1 && ecuacion1[1]==1) {
+            
+            aux_y = ecuacion2[2];
+            PuntosY.push(aux_y);
+            aux_x = (ecuacion1[2] - aux_y) / ecuacion1[0];
+            PuntosX.push(aux_x);
+            
+        }else if (ecuacion2[1]==1 && ecuacion1[1]!=1) {
+
+            aux_y = ecuacion2[2];
+            PuntosY.push(aux_y);
+            aux_x = (ecuacion1[2] -(aux_y*ecuacion1[1])) / ecuacion1[0];
+            PuntosX.push(aux_x);
+
+        }else if (ecuacion2[1]!=1 && ecuacion1[1]==1) {
+            
+            aux_y = ecuacion2[2] / ecuacion2[0];
+            PuntosY.push(aux_y);
+            aux_x = (ecuacion1[2] - aux_y) / ecuacion1[0];
+            PuntosX.push(aux_x);
+
         }
-    });
 
+    }else if (ecuacion2[1]==0 && ecuacion2[0]!=0 && ecuacion1[1]!=0 && ecuacion1[0]!=0) {
 
+        
+        if (ecuacion2[0]==1 && ecuacion1[0]==1) {
+            
+            aux_x = ecuacion2[2];
+            PuntosX.push(aux_x);
+            aux_y = (ecuacion1[2] - aux_x) / ecuacion1[1];
+            PuntosY.push(aux_y);
+            
+        }else if (ecuacion2[0]==1 && ecuacion1[0]!=1) {
+
+            aux_x = ecuacion2[2];
+            PuntosX.push(aux_x); 
+            aux_y = (ecuacion1[2] -(aux_x*ecuacion1[0])) / ecuacion1[1];
+            PuntosY.push(aux_y);
+
+        }else if (ecuacion2[0]!=1 && ecuacion1[0]==1) {
+            
+            aux_x = ecuacion2[2] / ecuacion1[0];
+            PuntosX.push(aux_x);
+            aux_y = (ecuacion1[2] - aux_x) / ecuacion1[1];
+            PuntosY.push(aux_y);
+        
+        }
+
+    }else if (ecuacion2[1]!=0 && ecuacion2[0]!=0 && ecuacion1[1]!=0 && ecuacion1[0]==0) {
+
+        if (ecuacion2[1]==1 && ecuacion1[1]==1) {
+            
+            aux_y = ecuacion1[2];
+            PuntosY.push(aux_y);
+            aux_x = (ecuacion2[2] - aux_y) / ecuacion2[0];
+            PuntosX.push(aux_x);
+            
+        }else if (ecuacion2[1]==1 && ecuacion1[1]!=1) {
+
+            aux_y = ecuacion1[2];
+            PuntosY.push(aux_y); 
+            aux_x = (ecuacion2[2] -(aux_y*ecuacion2[1])) / ecuacion2[0];
+            PuntosX.push(aux_x);
+
+        }else if (ecuacion2[1]!=1 && ecuacion1[1]==1) {
+            
+            aux_y = ecuacion1[2] / ecuacion2[0];
+            PuntosY.push(aux_y);
+            aux_x = (ecuacion2[2] - aux_y) / ecuacion2[0];
+            PuntosX.push(aux_x);
+
+        }
+        
+    }else if (ecuacion2[1]!=0 && ecuacion2[0]!=0 && ecuacion1[1]==0 && ecuacion1[0]!=0) {
+        
+        if (ecuacion2[0]==1 && ecuacion1[0]==1) {
+            
+            aux_x = ecuacion1[2];
+            PuntosX.push(aux_x);
+            aux_y = (ecuacion2[2] - aux_x) / ecuacion2[1];
+            PuntosY.push(aux_y);
+            
+        }else if (ecuacion2[0]==1 && ecuacion1[0]!=1) {
+
+            aux_x = ecuacion1[2];
+            PuntosX.push(aux_x); 
+            aux_y = (ecuacion2[2] -(aux_x*ecuacion2[0])) / ecuacion2[1];
+            PuntosY.push(aux_y);
+
+        }else if (ecuacion2[0]!=1 && ecuacion1[0]==1) {
+            
+            aux_x = ecuacion1[2] / ecuacion2[0];
+            PuntosX.push(aux_x);
+            aux_y = (ecuacion2[2] - aux_x) / ecuacion2[1];
+            PuntosY.push(aux_y);
+
+        }
+        
+    }else{
+        let fun1 = new Array();
+        let fun2 = new Array();
+
+        if (ecuacion1[1] > 0 && ecuacion2[1] > 0) { // ambos positivos
+            
+            fun1[0] = ecuacion1[0]*ecuacion2[1];
+            fun1[1] = ecuacion1[1]*ecuacion2[1];
+            fun1[2] = ecuacion1[2]*ecuacion2[1];
+
+            fun2[0] = ecuacion2[0] * -ecuacion1[1];
+            fun2[1] = ecuacion2[1] * -ecuacion1[1];
+            fun2[2] = ecuacion2[2] * -ecuacion1[1];
+
+            aux_x = (fun1[2] + fun2[2]) / (fun1[0] + fun2[0]);
+            PuntosX.push(aux_x);
+
+            aux_y = (fun1[2] -(fun1[0]*aux_x))/ fun1[1];
+            PuntosY.push(aux_y);
+
+        }else if (ecuacion1[1] > 0 && ecuacion2[1] < 0 ) { // Y1 positivo, Y2, negativo
+            fun1[0] = ecuacion1[0] * ecuacion2[1];
+            fun1[1] = ecuacion1[1] * ecuacion2[1];
+            fun1[2] = ecuacion1[2] * ecuacion2[1];
+
+            fun2[0] = ecuacion2[0] * -ecuacion1[1];
+            fun2[1] = ecuacion2[1] * -ecuacion1[1];
+            fun2[2] = ecuacion2[2] * -ecuacion1[1];
+            
+            aux_x = (fun1[2] + fun2[2]) / (fun1[0] + fun2[0]);
+            console.log("res: "+fun1[2] +"+"+ fun2[2] + "   res2:"+ fun1[0] +"+"+ fun2[0]);
+            PuntosX.push(aux_x);
+
+            aux_y = (fun1[2] -(fun1[0]*aux_x))/ fun1[1];
+            PuntosY.push(aux_y);
+
+        }else if (ecuacion1[1] < 0 && ecuacion2[1] > 0 ) { // Y1 positivo, Y2, negativo
+            fun1[0] = ecuacion1[0] * ecuacion2[1];
+            fun1[1] = ecuacion1[1] * ecuacion2[1];
+            fun1[2] = ecuacion1[2] * ecuacion2[1];
+
+            fun2[0] = ecuacion2[0] * -ecuacion1[1];
+            fun2[1] = ecuacion2[1] * -ecuacion1[1];
+            fun2[2] = ecuacion2[2] * -ecuacion1[1];
+            
+            aux_x = (fun1[2] + fun2[2]) / (fun1[0] + fun2[0]);
+            PuntosX.push(aux_x);
+
+            aux_y = (fun1[2] -(fun1[0]*aux_x))/ fun1[1];
+            PuntosY.push(aux_y);
+
+        }
+    }
+
+    console.log("Puntos de X");
+    console.log(PuntosX);
+    console.log("Puntos de Y");
+    console.log(PuntosY);
 
 
 }
 
+function PlanoC(){  
+    
+    
+    let numerosAlAzar = [300,500,0]; // X
+    let numerosAlAzar1 = [900,500,35]; // Y
+
+    // Combina los dos arreglos
+    const todosLosNumeros = [...numerosAlAzar, ...numerosAlAzar1];
+
+    // Encuentra el número máximo
+    const mayorNumero = Math.max(...todosLosNumeros);
+
+    console.log("Número mayor");
+    console.log(mayorNumero);
+
+    // cada 56px se pone el número del eje del plano 
+
+
+    const canvas = document.getElementById("m_grafico_op");
+
+    if (canvas.getContext) {
+        const contexto = canvas.getContext("2d");
+
+
+        const maxX = 560;
+        const maxY = 560;
+        const divisionesX = 12;
+        const divisionesY = 12;
+        const margenIzquierdo = 30;
+        const margenSuperior = 10;
+        const rectasX = [300,500,0]; // Valores X de las rectas
+        const rectasY = [900,500,35]; // Valores Y de las rectas
+
+
+   // Configurar el estilo del plano cartesiano
+   contexto.strokeStyle = "#ccc";
+   contexto.lineWidth = 1;
+
+   // Dibujar ejes X e Y con margen
+   contexto.beginPath();
+   contexto.moveTo(margenIzquierdo, maxY + margenSuperior);
+   contexto.lineTo(600 - margenIzquierdo, maxY + margenSuperior); // 600 es el ancho del canvas
+   contexto.moveTo(margenIzquierdo, margenSuperior);
+   contexto.lineTo(margenIzquierdo, maxY + margenSuperior);
+   contexto.stroke();
+
+   // Dibujar divisiones en el eje X
+   const anchoUtilizable = 600 - 2 * margenIzquierdo;
+   const pasoX = anchoUtilizable / divisionesX;
+   for (let i = 1; i < divisionesX; i++) {
+       const x = margenIzquierdo + i * pasoX;
+       contexto.beginPath();
+       contexto.moveTo(x, maxY + margenSuperior - 5);
+       contexto.lineTo(x, maxY + margenSuperior + 5);
+       contexto.stroke();
+
+       // Etiquetar las divisiones en el eje X
+       contexto.font = "10px Arial";
+       contexto.fillStyle = "black";
+       contexto.fillText((Math.round(mayorNumero/11 * i)), x - 5, maxY + margenSuperior + 20);
+   }
+
+   // Dibujar divisiones en el eje Y
+   const altoUtilizable = maxY;
+   const pasoY = altoUtilizable / divisionesY;
+   for (let i = 1; i < divisionesY; i++) {
+       const y = margenSuperior + i * pasoY;
+       contexto.beginPath();
+       contexto.moveTo(margenIzquierdo - 5, maxY + margenSuperior - y);
+       contexto.lineTo(margenIzquierdo + 5, maxY + margenSuperior - y);
+       contexto.stroke();
+
+       // Etiquetar las divisiones en el eje Y
+       contexto.font = "10px Arial";
+       contexto.fillStyle = "black";
+       contexto.fillText((Math.round(mayorNumero/11 * i)), margenIzquierdo - 20, maxY + margenSuperior - y + 5);
+   }
+
+   // Dibujar las rectas
+   contexto.strokeStyle = "blue"; // Color para las rectas
+   contexto.lineWidth = 2;
+
+   for (let i = 0; i < rectasX.length; i++) {
+       contexto.beginPath();
+       contexto.moveTo(rectasX[i - 1] + margenIzquierdo, maxY - rectasY[i - 1] + margenSuperior);
+       contexto.lineTo(rectasX[i] + margenIzquierdo, maxY - rectasY[i] + margenSuperior);
+       contexto.stroke();
+   }
+
+   // Etiquetar los ejes
+   contexto.font = "12px Arial";
+   contexto.fillStyle = "black";
+   contexto.fillText("X", 600 - margenIzquierdo, maxY + margenSuperior + 20);
+   contexto.fillText("Y", margenIzquierdo - 20, margenSuperior + 10);
+
+    }
+}
+
+function PlanoC1(){  
+    
+    let numerosAlAzar = [10, 0, 210, 0, 55]; // X
+    let numerosAlAzar1 = [0, 85, 0, 44, 0]; // Y
+
+    // Combina los dos arreglos
+    const todosLosNumeros = [...numerosAlAzar, ...numerosAlAzar1];
+
+    // Encuentra el número máximo
+    const mayorNumero = Math.max(...todosLosNumeros);
+
+    console.log("Número mayor");
+    console.log(mayorNumero);
+
+    // cada 56px se pone el número del eje del plano 
+
+
+    const canvas = document.getElementById("m_grafico_op");
+
+    if (canvas.getContext) {
+        const contexto = canvas.getContext("2d");
+
+
+        const maxX = 560;
+        const maxY = 560;
+        const divisionesX = 12;
+        const divisionesY = 12;
+        const margenIzquierdo = 30;
+        const margenSuperior = 10;
+
+
+        // Configurar el estilo del plano cartesiano
+        contexto.strokeStyle = "#ccc";
+        contexto.lineWidth = 1;
+
+        // Dibujar ejes X e Y con margen
+        contexto.beginPath();
+        contexto.moveTo(margenIzquierdo, maxY + margenSuperior);
+        contexto.lineTo(600 - margenIzquierdo, maxY + margenSuperior); // 600 es el ancho del canvas
+        contexto.moveTo(margenIzquierdo, margenSuperior);
+        contexto.lineTo(margenIzquierdo, maxY + margenSuperior);
+        contexto.stroke();
+
+        // Dibujar divisiones en el eje X
+        const anchoUtilizable = 600 - 2 * margenIzquierdo;
+        const pasoX = anchoUtilizable / divisionesX;
+        for (let i = 1; i < divisionesX; i++) {
+            const x = margenIzquierdo + i * pasoX;
+            contexto.beginPath();
+            contexto.moveTo(x, maxY + margenSuperior - 5);
+            contexto.lineTo(x, maxY + margenSuperior + 5);
+            contexto.stroke();
+
+            // Etiquetar las divisiones en el eje X
+            contexto.font = "10px Arial";
+            contexto.fillStyle = "black";
+            contexto.fillText((Math.round(mayorNumero/11 * i)), x - 5, maxY + margenSuperior + 20);
+        }
+
+        // Dibujar divisiones en el eje Y
+        const altoUtilizable = maxY;
+        const pasoY = altoUtilizable / divisionesY;
+        for (let i = 1; i < divisionesY; i++) {
+            const y = margenSuperior + i * pasoY;
+            contexto.beginPath();
+            contexto.moveTo(margenIzquierdo - 5, maxY + margenSuperior - y);
+            contexto.lineTo(margenIzquierdo + 5, maxY + margenSuperior - y);
+            contexto.stroke();
+
+            // Etiquetar las divisiones en el eje Y
+            contexto.font = "10px Arial";
+            contexto.fillStyle = "black";
+            contexto.fillText((Math.round(mayorNumero/11 * i)), margenIzquierdo - 20, maxY + margenSuperior - y + 5);
+        }
+
+        // Etiquetar los ejes
+        contexto.font = "12px Arial";
+        contexto.fillStyle = "black";
+        contexto.fillText("X", 600 - margenIzquierdo, maxY + margenSuperior + 20);
+        contexto.fillText("Y", margenIzquierdo - 20, margenSuperior + 10);
+
+
+
+
+
+
+
+    }
+}
 
 function Generar_metodo() {
     let combo = document.getElementById("grafico_simplex");
@@ -1256,4 +1905,3 @@ function Generar_metodo() {
     }
 
 }
-
