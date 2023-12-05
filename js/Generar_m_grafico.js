@@ -74,12 +74,12 @@ function Generar_grafico() {
                 } else {
                     document.getElementById("Res_objetivo").innerHTML += " + " + matriz[i][y] + "Y ";
                     if (rest_1 == "mayor_igual") {
-
                         restriccion.push("mayor_igual");
                         document.getElementById("Res_objetivo").innerHTML += " ≥ ";
                         document.getElementById("Res_objetivo").innerHTML += matriz[i][y + 1];
 
                     } else if (rest_1 == "menor_igual") {
+                        restriccion.push("menor_igual");
                         document.getElementById("Res_objetivo").innerHTML += " ≤ ";
                         document.getElementById("Res_objetivo").innerHTML += matriz[i][y + 1];
                     }
@@ -88,6 +88,7 @@ function Generar_grafico() {
         }
     }
     document.getElementById("Res_objetivo").innerHTML += "<br> X, Y ≥ 0";
+    console.log(restriccion);
 
 
     // Extrayendo las coordenadas X y Y de cada una de las restricciones
@@ -99,41 +100,46 @@ function Generar_grafico() {
     for (let i = 0; i < n_restricciones; i++) {
         if (matriz[i][0] == 0) {
             recta_X.push(0);
-            recta_Y.push(matriz[i][1] / matriz[i][1]);
+            recta_Y.push(matriz[i][2] / matriz[i][1]);
+            console.log("Y cuando X es 0: "+ matriz[i][2] / matriz[i][1]);
 
         } else if (matriz[i][1] == 0) {
-            recta_X.push(matriz[i][1] / matriz[i][0]);
+            recta_X.push(matriz[i][2] / matriz[i][0]);
             recta_Y.push(0);
+            
+            console.log("X cuando Y es 0: "+ matriz[i][2] / matriz[i][0]);
 
         } else {
             coordenadas_X.push(0);
-            coordenadas_Y.push(matriz[i][0] / matriz[i][1]);
-            coordenadas_X.push(matriz[i][1] / matriz[i][0]);
+            coordenadas_Y.push(matriz[i][2] / matriz[i][1]);
+            coordenadas_X.push(matriz[i][2] / matriz[i][0]);
             coordenadas_Y.push(0);
         }
     }
-
-
-
-    // Graficar las restricciones
-    // Comenzar a determinar los puntos que delimitan la region factible
-    console.log("Funcion: ");
-    console.log(funcion);
-    console.log("Matriz: ");
-    console.log(matriz);
+    
+    // console.log("Puntos_X");
+    // console.log(Puntos_X);
+    // console.log("Puntos_Y");
+    // console.log(Puntos_Y);
+    // console.log("Coordenadas X: ");
+    // console.log(coordenadas_X);
+    // console.log("Coordenadas Y: ");
+    // console.log(coordenadas_Y);
+    // console.log("recta_X");
+    // console.log(recta_X);
+    // console.log("recta_Y");
+    // console.log(recta_Y);
 
     /**
-*  0 por 1, 2, 3, 4
-* 1 por 2, 3, 4
-* 2 por 3, 4
-* 3 por 4
-**/
+    *  0 por 1, 2, 3, 4
+    * 1 por 2, 3, 4
+    * 2 por 3, 4
+    * 3 por 4
+    **/
     let Puntos_X = new Array();
     let Puntos_Y = new Array();
-
     let ec1 = new Array();
     let ec2 = new Array();
-
     let auxi = n_restricciones;
     let auxiliar;
     // Bucle exterior para el primer número (0 a 3)
@@ -154,20 +160,21 @@ function Generar_grafico() {
         }
     }
 
-    // console.log("Puntos_X");
-    // console.log(Puntos_X);
-    // console.log("Puntos_Y");
-    // console.log(Puntos_Y);
-    // console.log("Coordenadas X: ");
-    // console.log(coordenadas_X);
-    // console.log("Coordenadas Y: ");
-    // console.log(coordenadas_Y);
-    // console.log("recta_X");
-    // console.log(recta_X);
-    // console.log("recta_Y");
-    // console.log(recta_Y);
-    let factiblesX = [...coordenadas_X, ...Puntos_X, ...recta_X];
-    let factiblesY = [...coordenadas_X, ...Puntos_Y, ...recta_Y];
+    let factiblesX = new Array();
+    let factiblesY = new Array();
+
+    for (let i = 0; i < coordenadas_X.length; i++) {
+        factiblesX.push(coordenadas_X[i]);
+        factiblesY.push(coordenadas_Y[i]);        
+    }
+    for (let i = 0; i < Puntos_X.length; i++) {
+        factiblesX.push(Puntos_X[i]);
+        factiblesY.push(Puntos_Y[i]);        
+    }
+    for (let i = 0; i < recta_X.length; i++) {
+        factiblesX.push(recta_X[i]);
+        factiblesY.push(recta_Y[i]);        
+    }
 
     console.log("Concatenación");
     console.log(factiblesX);
@@ -176,24 +183,203 @@ function Generar_grafico() {
     ValoresZ = new Array();
 
     for (let i = 0; i < factiblesX.length; i++) {
-        ValoresZ.push((funcion[0] * factiblesX[i]) * (funcion[1] * factiblesY[i]));
+        ValoresZ.push((funcion[0] * factiblesX[i]) + (funcion[1] * factiblesY[i]));
     }
 
+    console.log("Valores de Z en los puntos");
+    console.log(ValoresZ);
 
-    document.getElementById("cuerpo_grafico").innerHTML = "";
-    for (let i = 0; i < factiblesX.length; i++) {
+    // document.getElementById("cuerpo_grafico").innerHTML = "";
+
+    let Puntos_solucionX = new Array();
+    let Puntos_solucionY = new Array();
 
 
-        if (ValoresZ[i] > 0) {
-            if (objetivo == "Maximizar") {
-            } else if (objetivo == "Minimizar") {
+    let condicion = new Array();
+    let aux_solucion ;
+    // console.log("antes del ciclo ");
+    let lim = 0;
+    if (objetivo == "Maximizar") {
+        
+        if (restriccion[lim] == "menor_igual") {
+            
+            for (let y = 0; y < factiblesX.length; y++) {
+                auxiliar = 0;
+                for (let i = 0; i < n_restricciones; i++) {
+                    aux_solucion = ( (matriz[i][0] * factiblesX[y]) + (matriz[i][1] * factiblesY[y]) );
+                    // console.log("("+matriz[i][0]+"*"+factiblesX[y]+")+("+matriz[i][1]+"*"+factiblesY[y]+")");
+                    // console.log("(Valor de la restriccion = "+matriz[i][2]+")");
+                    if (aux_solucion <= matriz[i][2] || aux_solucion == 0) {
+                        auxiliar++;
+                    }
+                }
+                condicion.push(auxiliar);
             }
+
+            for (let i = 0; i < factiblesX.length; i++) {
+                if (condicion[i] == n_restricciones){
+                    Puntos_solucionX.push(factiblesX[i]);
+                    Puntos_solucionY.push(factiblesY[i]);
+                }  
+            }
+            
+        }else if (restriccion[lim] == "menor_igual") {
+            
+            for (let y = 0; y < factiblesX.length; y++) {
+                auxiliar = 0;
+                for (let i = 0; i < n_restricciones; i++) {
+                    aux_solucion = ( (matriz[i][0] * factiblesX[y]) + (matriz[i][1] * factiblesY[y]) );
+                    // console.log("("+matriz[i][0]+"*"+factiblesX[y]+")+("+matriz[i][1]+"*"+factiblesY[y]+")");
+                    // console.log("(Valor de la restriccion = "+matriz[i][2]+")");
+                    if (aux_solucion <= matriz[i][2] || aux_solucion == 0) {
+                        auxiliar++;
+                    }
+                }
+                condicion.push(auxiliar);
+            }
+
+            for (let i = 0; i < factiblesX.length; i++) {
+                if (condicion[i] == n_restricciones){
+                    Puntos_solucionX.push(factiblesX[i]);
+                    Puntos_solucionY.push(factiblesY[i]);
+                }  
+            }
+            
+        }
+
+        lim++;
+
+    } else if (objetivo == "Minimizar") {
+        if (restriccion[lim] == "menor_igual") {
+            
+            for (let y = 0; y < factiblesX.length; y++) {
+                auxiliar = 0;
+                for (let i = 0; i < n_restricciones; i++) {
+                    aux_solucion = ( (matriz[i][0] * factiblesX[y]) + (matriz[i][1] * factiblesY[y]) );
+                    // console.log("("+matriz[i][0]+"*"+factiblesX[y]+")+("+matriz[i][1]+"*"+factiblesY[y]+")");
+                    // console.log("(Valor de la restriccion = "+matriz[i][2]+")");
+                    if (aux_solucion <= matriz[i][2] || aux_solucion == 0) {
+                        auxiliar++;
+                    }
+                }
+                condicion.push(auxiliar);
+            }
+
+            for (let i = 0; i < factiblesX.length; i++) {
+                if (condicion[i] == n_restricciones){
+                    Puntos_solucionX.push(factiblesX[i]);
+                    Puntos_solucionY.push(factiblesY[i]);
+                }  
+            }
+            
+        }else if (restriccion[lim] == "mayor_igual") {
+            
+            for (let y = 0; y < factiblesX.length; y++) {
+                auxiliar = 0;
+                for (let i = 0; i < n_restricciones; i++) {
+                    aux_solucion = ( (matriz[i][0] * factiblesX[y]) + (matriz[i][1] * factiblesY[y]) );
+                    // console.log("("+matriz[i][0]+"*"+factiblesX[y]+")+("+matriz[i][1]+"*"+factiblesY[y]+")");
+                    // console.log("(Valor de la restriccion = "+matriz[i][2]+")");
+                    if (aux_solucion <= matriz[i][2] || aux_solucion == 0) {
+                        auxiliar++;
+                    }
+                }
+                condicion.push(auxiliar);
+            }
+
+            for (let i = 0; i < factiblesX.length; i++) {
+                if (condicion[i] == n_restricciones){
+                    Puntos_solucionX.push(factiblesX[i]);
+                    Puntos_solucionY.push(factiblesY[i]);
+                }  
+            }
+            
         }
     }
 
 
+    console.log(Puntos_solucionX);
+    console.log(Puntos_solucionY);
+
     // Valores en la tabla del método gráfico 
     let abc = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
+   
+
+    if (objetivo == "Maximizar") {
+        auxiliar = 0;
+        for (let i = 0; i < restriccion.length; i++) {
+            if (restriccion[i] == "mayor_igual") {
+                auxiliar++;
+            }            
+        }
+
+        if (auxiliar == n_restricciones){
+            document.getElementById("solucion_m_grafico").innerHTML += '<p style="font-size: 1.2rem; color: aliceblue;"> La región factible no se encuentra limitada; por lo tanto el problema tiene soluciones ilimitadas no acotadas. </p> <br>'
+
+        }else{
+
+            document.getElementById("cuerpo_grafico").innerHTML = "";
+            document.getElementById("cabeza_grafico").innerHTML = "";
+
+            document.getElementById("cabeza_grafico").innerHTML += '<tr class="table-primary"> <th scope="col">Punto <br>...</th>';
+            document.getElementById("cabeza_grafico").innerHTML += '<th scope="col">Coordenadas <br> (X,Y)</th> <th scope="col">Valor de la función objetivo <br>Z = X + Y</th> </tr>';
+
+            auxiliar = 0;
+            for (let i = 0; i < Puntos_solucionX.length; i++) {
+                document.getElementById("cuerpo_grafico").innerHTML += '<tr id= "tr'+i+'">';
+        
+                auxiliar = ((funcion[0] * Puntos_solucionX[i]) +  (funcion[1] * Puntos_solucionY[i]))
+                document.getElementById('tr'+i).innerHTML += "<th>"+abc[i]+"</th>";
+                document.getElementById('tr'+i).innerHTML += "<th>("+Puntos_solucionX[i]+" , "+Puntos_solucionY[i]+")</th>";
+                document.getElementById('tr'+i).innerHTML += "<th>"+funcion[0]+"("+Puntos_solucionX[i]+") + "+funcion[1]+"("+Puntos_solucionY[i]+") = "+auxiliar+"</th>";
+                
+                document.getElementById("cuerpo_grafico").innerHTML += "</tr>";
+            } 
+
+        }
+
+
+    }else if (objetivo == "Minimizar") {
+        auxiliar = 0;
+        for (let i = 0; i < restriccion.length; i++) {
+            if (restriccion[i] == "menor_igual") { 
+                auxiliar++;
+            }  
+            
+        }
+
+        if (auxiliar == n_restricciones){
+            document.getElementById("solucion_m_grafico").innerHTML += '<p style="font-size: 1.2rem; color: aliceblue;"> La región factible no se encuentra limitada; por lo tanto el problema tiene soluciones ilimitadas no acotadas. </p> <br>'
+
+        }else{
+            
+            document.getElementById("cuerpo_grafico").innerHTML = "";
+            document.getElementById("cabeza_grafico").innerHTML = "";
+
+            document.getElementById("cabeza_grafico").innerHTML += '<tr class="table-primary"> <th scope="col">Punto <br>...</th>';
+            document.getElementById("cabeza_grafico").innerHTML += '<th scope="col">Coordenadas <br> (X,Y)</th> <th scope="col">Valor de la función objetivo <br>Z = X + Y</th> </tr>';
+                                            
+            auxiliar = 0;
+            for (let i = 0; i < Puntos_solucionX.length; i++) {
+                document.getElementById("cuerpo_grafico").innerHTML += '<tr id= "tr'+i+'">';
+        
+                auxiliar = ((funcion[0] * Puntos_solucionX[i]) +  (funcion[1] * Puntos_solucionY[i]))
+                document.getElementById('tr'+i).innerHTML += "<th>"+abc[i]+"</th>";
+                document.getElementById('tr'+i).innerHTML += "<th>("+Puntos_solucionX[i]+" , "+Puntos_solucionY[i]+")</th>";
+                document.getElementById('tr'+i).innerHTML += "<th>"+funcion[0]+"("+Puntos_solucionX[i]+") + "+funcion[1]+"("+Puntos_solucionY[i]+") = "+auxiliar+"</th>";
+                
+                document.getElementById("cuerpo_grafico").innerHTML += "</tr>";
+            } 
+            document.getElementById("solucion_m_grafico").innerHTML += '<p style="font-size: 1.2rem; color: aliceblue;"> La región factible no se encuentra limitada; por lo tanto el problema tiene soluciones ilimitadas no acotadas. </p> <br>'
+
+
+        }
+    }
+
+
+
+
+
 
 
 

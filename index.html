@@ -21,12 +21,9 @@
 
 
       <script>
-         window.onload = function () {
-            PlanoC();
-            let numerosAlAzar = [4,-5,10]; // X
-            let numerosAlAzar1 = [3,-2,20]; // Y
-            console.log(SistEcuaciones(numerosAlAzar, numerosAlAzar1));
-        };
+         // window.onload = function () {
+         //    PlanoC();
+         // };
       </script>
 <!-- TemplateMo 579 Cyborg Gaming
 https://templatemo.com/tm-579-cyborg-gaming
@@ -103,8 +100,8 @@ https://templatemo.com/tm-579-cyborg-gaming
                            <center>
                               <select id="grafico_simplex" style="width : 200px; box-sizing:border-box" onchange="Method_1();" class="form-select">
                                  <!-- <option value="grafico">Grafico</option>  -->
-                                 <option id="grafico" >Grafico</option> 
                                  <option id="simplex" >Método Simplex</option>
+                                 <option id="grafico" >Grafico</option> 
                                  
                               </select> <br>
                               <label for="tam_variables"><h5>Cantidad de variables</h5></label>
@@ -184,8 +181,6 @@ https://templatemo.com/tm-579-cyborg-gaming
                      <center>
                         <!-- MATRICES INICIAL PRIMERA FASE, IT. PRIMERA FASE, INICIAL DE LA SEGUNDA FASE E IT. SEGUNDA FASE -->
                         <div id="mat_primera" class="scrollme">
-                           <center> <h5>Matriz Inicial <u>Primera fase</u></h5> <br> </center>
-
                            <table id="mat_inicial" class="table table-light"  
                            style="table-layout: fixed !important; 
                            border-radius: 8px !important; 
@@ -224,22 +219,11 @@ https://templatemo.com/tm-579-cyborg-gaming
                         <p  id="Res_objetivo" style="font-size: 1.2rem; color: aliceblue;"></p>
                         <br>
                         <center>
-                           <table class="table table-light" style="text-align: center;">
-                              <thead>
-                              <tr class="table-primary">
-                                 <th scope="col">Punto <br>...</th>
-                                 <th scope="col">Coordenadas <br> (X,Y)</th>
-                                 <th scope="col">Valor de la función objetivo <br>Z = X + Y</th>
-                              </tr>
-                              </thead>
-                              <tbody id="cuerpo_grafico">
-                                 <tr>
-                                    <th>0</th>
-                                    <td>1</td>
-                                    <td>2</td>
-                                 </tr>
-                              </tbody>
+                           <table id="tabla_m_grafico" class="table table-light" style="text-align: center;">
+                              <thead id="cabeza_grafico"> </thead>
+                              <tbody id="cuerpo_grafico"> </tbody>
                            </table>
+                           <div id="solucion_m_grafico"></div>
                         </center>
 
                      </div>
